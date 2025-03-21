@@ -5,7 +5,6 @@ const api = axios.create({
   headers : {
     "Content-Type":"application/json",
   },
-  withCredentials: true,
 });
 
 const admin = axios.create({
@@ -13,7 +12,6 @@ const admin = axios.create({
   headers : {
     "Content-Type":"application/json",
   },
-  withCredentials: true,
 });
 
 const key = process.env.NEXT_PUBLIC_ADMIN_KEY;
