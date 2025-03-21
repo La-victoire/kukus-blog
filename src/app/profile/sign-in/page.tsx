@@ -65,16 +65,16 @@ export default function AuthPage() {
 
     try {
       const createProfile = {
-        firstname,
-        lastname,
-        email,
-        password
+        firstname, lastname, email, password,
       }
       const data:any = await profile("/signup",createProfile)
       const userId = data.user._id
       setIsLoading(false)
       if (userId) {
         router.push(`/profile/${userId}`)
+      }
+      if(!userId){
+        location.reload();
       }
     } catch (error) {
       console.log(error)

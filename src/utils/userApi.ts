@@ -26,7 +26,7 @@ type ApiResponse<T> = {
 };
 
 // GET Request from this Api
-export const getUser = async <T>(endpoint: string | number): Promise<T> => {
+export const getUser = async <T>(endpoint: any): Promise<T> => {
   try {
     const response = await api.get<ApiResponse<T>>(`${endpoint}`);
     return response.data.data;

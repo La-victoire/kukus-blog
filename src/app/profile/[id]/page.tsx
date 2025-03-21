@@ -14,7 +14,7 @@ import { Pencil, Plus } from "lucide-react"
 import Link from "next/link"
 import useSWR from "swr"
 import { getUser, postAdminSession } from "@/utils/userApi"
-
+import { useParams } from "next/navigation"
 
 // Mock user data
 const user = {
@@ -52,19 +52,33 @@ const userPosts = [
 
 const fetcher = (url: string) => getUser<any>(url);
 
-export default function ProfilePage() {
+export default function ProfilePage () {
+  const params = useParams();
+  const id = params.id;
+  const { data:users, error:userError, isLoading:userLoading } = useSWR(id,fetcher);
   const [isEditing, setIsEditing] = useState(false)
   const [profileData, setProfileData] = useState({
     name: user.name,
     email: user.email,
     bio: user.bio,
   })
-  const { data:users, error:userError, isLoading:userLoading } = useSWR(fetcher);
-  
   const handleProfileUpdate = (e: React.FormEvent) => {
     e.preventDefault()
     // In a real app, you would send this data to your backend
     setIsEditing(false)
+  }
+  
+  const fetchUserData = async () => {
+    try {
+      
+
+     const data = await getUser<any>(id)
+      console.log(id);
+      console.log(data);
+      
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   return (
@@ -77,8 +91,8 @@ export default function ProfilePage() {
               <div className="flex flex-col items-center text-center">
                 <div className="relative">
                   <Avatar className="h-24 w-24">
-                    <AvatarImage src={user.avatar} alt={users.name} />
-                    <AvatarFallback>{users.name.charAt(0)}</AvatarFallback>
+                    <AvatarImage src={user.avatar} alt={user.name} />
+                    <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
                   </Avatar>
                   <Button
                     size="icon"
@@ -89,7 +103,7 @@ export default function ProfilePage() {
                     <Pencil className="h-4 w-4" />
                   </Button>
                 </div>
-                <h2 className="mt-4 text-xl font-bold">{users.name}</h2>
+                <h2 className="mt-4 text-xl font-bold">{user.name}</h2>
                 <p className="text-sm text-muted-foreground">Member since {user.joinedDate}</p>
                 <div className="mt-6 w-full">
                   <Link href="/create-blog">
@@ -98,6 +112,9 @@ export default function ProfilePage() {
                       Create New Blog
                     </Button>
                   </Link>
+                    <button onClick={fetchUserData} className="bg-yellow hover:cursor-pointer">
+                      try me
+                    </button>
                 </div>
               </div>
             </CardContent>
