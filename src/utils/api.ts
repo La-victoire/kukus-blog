@@ -4,7 +4,8 @@ const postsApi = axios.create({
   baseURL: "https://kuku-api-production.up.railway.app/v1/posts",
   headers : {
     "Content-Type":"application/json",
-  }
+  },
+  withCredentials:true
 });
 
 
@@ -12,7 +13,8 @@ const profileApi = axios.create({
   baseURL: "https://kuku-api-production.up.railway.app/v1/auth",
   headers : {
     "Content-Type":"application/json",
-  }
+  },
+  withCredentials:true
 });
 
 

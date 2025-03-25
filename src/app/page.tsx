@@ -18,11 +18,8 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { ArrowRight, ChevronRight, Heart, MessageCircle, Share2, Search, Menu, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 
-// const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOnsiX2lkIjoiNjdjOTE1NWEwMjE1YzYxZGM0ZjZlYjEzIiwibmFtZSI6IlZpY3RvcnkiLCJlbWFpbCI6InZpY3RvcnlvZ2h1dmJ1QGdtYWlsLmNvbSIsInBhc3N3b3JkIjoiJDJiJDEwJHRtLkpncmY5bkNtMmxYWWVCRVZkaHUwNWlmLmdyaUNOaGVUSXV6QkN3aDRkb0dkN2d6b1o2Iiwicm9sZSI6ImFkbWluIiwiY3JlYXRlZEF0IjoiMjAyNS0wMy0wNlQwMzoyNDoxMC4wMjZaIiwidXBkYXRlZEF0IjoiMjAyNS0wMy0wNlQwMzoyNDoxMC4wMjZaIiwiX192IjowfSwiaWF0IjoxNzQxOTMxMDg4LCJleHAiOjE3NDIwMTc0ODh9.ODJYWrxsKHJoFn2tZVKkVSEzo11dvtjJe5l5kltBbJA"
 const fetcher = (url: string) => getData<any>(url);
-// const userFetcher = (url:string , token: string) => getUser<any>(url, token)
 
-// const searcher = (url: string) => getData<any>(url);
 
 const DataComponent = () => { 
   const [image, setImage] = useState();
@@ -30,7 +27,6 @@ const DataComponent = () => {
   const [value, setValue] = useState("");
   const [isQuery, setIsQuery] = useState(false);
   const { data:posts, error:postError, isLoading:postsLoading } = useSWR("/view", fetcher);
-  // const { data:users, error:userError, isLoading:userLoading } = useSWR( token ? ["/", token] : null, userFetcher);
 
   
   const handleSearch = async ()=> {

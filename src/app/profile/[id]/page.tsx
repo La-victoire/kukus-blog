@@ -15,6 +15,7 @@ import Link from "next/link"
 import useSWR from "swr"
 import { getUser, postAdminSession } from "@/utils/userApi"
 import { useParams } from "next/navigation"
+import { getData } from "@/utils/api"
 
 // Mock user data
 const user = {
@@ -51,37 +52,38 @@ const userPosts = [
 ]
 
 const fetcher = (url: string) => getUser<any>(url);
+const dataFetcher = (url: string) => getData<any>(url);
 
 export default function ProfilePage () {
   const params = useParams();
   const id = params.id;
   const { data:users, error:userError, isLoading:userLoading } = useSWR(id,fetcher);
+  const { data:posts, error:postError, isLoading:postsLoading } = useSWR("/view", dataFetcher);
   const [isEditing, setIsEditing] = useState(false)
   const [profileData, setProfileData] = useState({
     name: user.name,
     email: user.email,
     bio: user.bio,
   })
+  const postUser = posts?.filter((item:any)=>(
+    item?.user?._id === id
+  ))
+  console.log(posts)
   const handleProfileUpdate = (e: React.FormEvent) => {
     e.preventDefault()
     // In a real app, you would send this data to your backend
     setIsEditing(false)
   }
+  const properDate = (date:any) => {
+    return new Date(date).toLocaleDateString("en-US", { month: "short",
+      day:"2-digit",
+      year:"numeric"
+    });
+  };
   
-  const fetchUserData = async () => {
-    try {
-      
-
-     const data = await getUser<any>(id)
-      console.log(id);
-      console.log(data);
-      
-    } catch (error) {
-      console.error(error);
-    }
-  }
 
   return (
+    <>
     <div className="container max-w-5xl py-12">
       <div className="grid gap-8 md:grid-cols-[300px_1fr]">
         {/* Profile sidebar */}
@@ -91,8 +93,8 @@ export default function ProfilePage () {
               <div className="flex flex-col items-center text-center">
                 <div className="relative">
                   <Avatar className="h-24 w-24">
-                    <AvatarImage src={user.avatar} alt={user.name} />
-                    <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                    <AvatarImage src={users?.profile_img} alt="Author Img"/>
+                    <AvatarFallback>{users?.firstname?.charAt(0) || users?.name?.charAt(0)}</AvatarFallback>
                   </Avatar>
                   <Button
                     size="icon"
@@ -103,18 +105,15 @@ export default function ProfilePage () {
                     <Pencil className="h-4 w-4" />
                   </Button>
                 </div>
-                <h2 className="mt-4 text-xl font-bold">{user.name}</h2>
-                <p className="text-sm text-muted-foreground">Member since {user.joinedDate}</p>
+                <h2 className="mt-4 text-xl font-bold">{users?.firstname || users?.name }</h2>
+                <p className="text-sm text-muted-foreground">Member since {properDate(users?.createdAt)}</p>
                 <div className="mt-6 w-full">
-                  <Link href="/create-blog">
+                  <Link href="/post/create">
                     <Button className="w-full">
                       <Plus className="mr-2 h-4 w-4" />
                       Create New Blog
                     </Button>
                   </Link>
-                    <button onClick={fetchUserData} className="bg-yellow hover:cursor-pointer">
-                      try me
-                    </button>
                 </div>
               </div>
             </CardContent>
@@ -141,14 +140,14 @@ export default function ProfilePage () {
                 </Link>
               </div>
 
-              {userPosts.length > 0 ? (
+              {postUser?.length > 0 ? (
                 <div className="grid gap-6">
-                  {userPosts.map((post) => (
+                  {postUser?.map((post) => (
                     <Card key={post.id}>
                       <div className="flex flex-col md:flex-row">
                         <div className="relative h-48 md:h-auto md:w-48 shrink-0">
                           <img
-                            src={post.coverImage || "/placeholder.svg"}
+                            src={post.coverImage || "/project_pics/abstract-5719221.jpg"}
                             alt={post.title}
                             className="h-full w-full object-cover"
                           />
@@ -158,9 +157,9 @@ export default function ProfilePage () {
                             <h3 className="text-xl font-bold hover:text-primary">{post.title}</h3>
                           </Link>
                           <p className="text-sm text-muted-foreground mt-1">{post.publishedAt}</p>
-                          <p className="mt-2">{post.excerpt}</p>
+                          <p className="mt-2">{post.description}</p>
                           <div className="mt-4 flex gap-2">
-                            <Link href={`/edit-blog/${post.id}`}>
+                            <Link href={`/edit-blog/${post._id}`}>
                               <Button variant="outline" size="sm">
                                 Edit
                               </Button>
@@ -200,7 +199,7 @@ export default function ProfilePage () {
                         <Label htmlFor="name">Full Name</Label>
                         <Input
                           id="name"
-                          value={profileData.name}
+                          value={users?.firstname}
                           onChange={(e) => setProfileData({ ...profileData, name: e.target.value })}
                         />
                       </div>
@@ -209,7 +208,7 @@ export default function ProfilePage () {
                         <Input
                           id="email"
                           type="email"
-                          value={profileData.email}
+                          value={users?.email}
                           onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
                         />
                       </div>
@@ -218,7 +217,7 @@ export default function ProfilePage () {
                         <Textarea
                           id="bio"
                           rows={4}
-                          value={profileData.bio}
+                          value={users?.bio || ""}
                           onChange={(e) => setProfileData({ ...profileData, bio: e.target.value })}
                         />
                       </div>
@@ -233,15 +232,15 @@ export default function ProfilePage () {
                     <div className="space-y-4">
                       <div className="grid grid-cols-[120px_1fr] gap-2">
                         <div className="font-medium">Name:</div>
-                        <div>{user.name}</div>
+                        <div>{users?.name || users?.firstname}</div>
                       </div>
                       <div className="grid grid-cols-[120px_1fr] gap-2">
                         <div className="font-medium">Email:</div>
-                        <div>{user.email}</div>
+                        <div>{users?.email}</div>
                       </div>
                       <div className="grid grid-cols-[120px_1fr] gap-2">
                         <div className="font-medium">Bio:</div>
-                        <div>{user.bio}</div>
+                        <div>{users?.bio || ""}</div>
                       </div>
                       <Button onClick={() => setIsEditing(true)}>Edit Profile</Button>
                     </div>
@@ -253,6 +252,7 @@ export default function ProfilePage () {
         </div>
       </div>
     </div>
+    </>
   )
 }
 

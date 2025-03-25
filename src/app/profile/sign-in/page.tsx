@@ -68,6 +68,7 @@ export default function AuthPage() {
         firstname, lastname, email, password,
       }
       const data:any = await profile("/signup",createProfile)
+      console.log(data)
       const userId = data.user._id
       setIsLoading(false)
       if (userId) {

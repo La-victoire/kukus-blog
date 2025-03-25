@@ -35,7 +35,7 @@ export const BlogCard = ({posts} : blogCardPost) => {
         {posts && ( 
           posts.map((post, index) => (
               <Card 
-                  key={posts._id} 
+                  key={post._id} 
                   className={cn(
                     "overflow-hidden group h-full transition-all duration-300 hover:shadow-lg border-none",
                     index === 0 && "md:col-span-2 md:row-span-2"
@@ -47,7 +47,7 @@ export const BlogCard = ({posts} : blogCardPost) => {
                   )}>
                     <Image
                       src={ "/project_pics/abstract-5719221.jpg"}
-                      alt={posts.title}
+                      alt={post.title}
                       fill
                       className="object-cover transition-transform duration-500 group-hover:scale-105"
                     />
@@ -58,36 +58,36 @@ export const BlogCard = ({posts} : blogCardPost) => {
                           animation: `pulse 2s infinite ${index * 0.2}s`
                         }}
                       >
-                        {posts.categories}
+                        {post.categories}
                       </Badge>
                     </div>
                   </div>
                   <CardContent className="p-6 bg-white dark:bg-gray-950">
                     <div className="flex items-center justify-between mb-3 text-sm text-muted-foreground">
-                      <span>{posts._createdAt}</span>
+                      <span>{post.createdAt}</span>
                       <span>10 mins</span>
                     </div>
-                    <Link href={`/blog/${posts._id}`}>
+                    <Link href={`/blog/${post._id}`}>
                       <h3 className={cn(
                         "font-bold mb-2 group-hover:text-primary transition-colors",
                         index === 0 ? "text-2xl" : "text-xl"
                       )}>
-                        {posts.title}
+                        {post.title}
                       </h3>
                     </Link>
                     <p className="text-muted-foreground mb-4 line-clamp-2">{posts.description}</p>
                     <div className="flex items-center justify-between">
-                      <Link href={`/blog/${posts._id}`} className="text-primary font-medium group-hover:underline">
+                      <Link href={`/blog/${post._id}`} className="text-primary font-medium group-hover:underline">
                         Read more
                       </Link>
                       <div className="flex items-center gap-4">
                         <button className="flex items-center gap-1 text-muted-foreground hover:text-primary transition-colors">
                           <Heart className="h-4 w-4" />
-                          <span className="text-sm">{posts.likes}</span>
+                          <span className="text-sm">{post.likes}</span>
                         </button>
                         <button className="flex items-center gap-1 text-muted-foreground hover:text-primary transition-colors">
                           <MessageCircle className="h-4 w-4" />
-                          <span className="text-sm">{posts.comments}</span>
+                          <span className="text-sm">{post.comments}</span>
                         </button>
                         <button className="text-muted-foreground hover:text-primary transition-colors">
                           <Share2 className="h-4 w-4" />

@@ -11,14 +11,18 @@ import { Textarea } from "@/components/ui/textarea"
 import { useRouter } from "next/navigation"
 import { ArrowLeft, ImageIcon, Loader2 } from "lucide-react"
 import Link from "next/link"
+import { postData } from "@/utils/api"
 
 export default function CreateBlogPage() {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [coverImage, setCoverImage] = useState<string | null>(null)
+  const [coverImage, setCoverImage] = useState<any | null>(null)
   const [formData, setFormData] = useState({
     title: "",
+    description:"",
+    categories:"",
     content: "",
+    coverImage: coverImage 
   })
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -26,20 +30,27 @@ export default function CreateBlogPage() {
     if (file) {
       // In a real app, you would upload this to a server and get a URL back
       // For this example, we'll use a placeholder
-      setCoverImage("/placeholder.svg?height=800&width=1600")
+      setCoverImage(file)
+      console.log(file)
+      console.log(coverImage)
     }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
-
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      console.log(formData)
+      const data:any = await postData("/create",formData)
+      console.log(data)
+      const userId = data.user._id
+       if (userId) {
+         router.push(`/post/${userId}`)
+       }
       setIsSubmitting(false)
-      // Redirect to the blog post (in a real app, you would redirect to the newly created post)
-      router.push("/blog/1")
-    }, 1500)
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   return (
@@ -96,6 +107,28 @@ export default function CreateBlogPage() {
               />
             </div>
 
+            <div className="space-y-2">
+              <Label htmlFor="description">Description</Label>
+              <Input
+                id="description"
+                placeholder="Describe what your post is about"
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="categories">Category</Label>
+              <Input
+                id="categories"
+                placeholder="Tech, Photography ..."
+                value={formData.categories}
+                onChange={(e) => setFormData({ ...formData, categories: e.target.value })}
+                required
+              />
+            </div>
+
             {/* Content */}
             <div className="space-y-2">
               <Label htmlFor="content">Content</Label>
@@ -113,7 +146,7 @@ export default function CreateBlogPage() {
             </div>
           </CardContent>
           <CardFooter className="flex justify-between">
-            <Button variant="outline" type="button" onClick={() => router.push("/profile")}>
+            <Button variant="outline" type="button" onClick={() => router.push("/")}>
               Cancel
             </Button>
             <div className="flex gap-2">
