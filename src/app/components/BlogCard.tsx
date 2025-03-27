@@ -14,8 +14,8 @@ interface posts {
   description: string,
   _id : number,
   likes: number,
-  comments: string,
-  _createdAt: any,
+  comments: any,
+  createdAt: any,
 }
 
 interface blogCardPost {
@@ -29,11 +29,11 @@ export const BlogCard = ({posts} : blogCardPost) => {
       year:"numeric"
     });
   };
-
+console.log(posts._id)
+console.log(posts.map((post)=>post._id))
   return (
     <>
-        {posts && ( 
-          posts.map((post, index) => (
+        {Array.isArray(posts) && ( posts?.map((post:posts, index:any) => (
               <Card 
                   key={post._id} 
                   className={cn(
@@ -64,7 +64,7 @@ export const BlogCard = ({posts} : blogCardPost) => {
                   </div>
                   <CardContent className="p-6 bg-white dark:bg-gray-950">
                     <div className="flex items-center justify-between mb-3 text-sm text-muted-foreground">
-                      <span>{post.createdAt}</span>
+                      <span>{properDate(post.createdAt)}</span>
                       <span>10 mins</span>
                     </div>
                     <Link href={`/blog/${post._id}`}>
@@ -75,19 +75,19 @@ export const BlogCard = ({posts} : blogCardPost) => {
                         {post.title}
                       </h3>
                     </Link>
-                    <p className="text-muted-foreground mb-4 line-clamp-2">{posts.description}</p>
+                    <p className="text-muted-foreground mb-4 line-clamp-2">{post.description}</p>
                     <div className="flex items-center justify-between">
-                      <Link href={`/blog/${post._id}`} className="text-primary font-medium group-hover:underline">
+                      <Link href={`/post/${post._id}`} className="text-primary font-medium group-hover:underline">
                         Read more
                       </Link>
                       <div className="flex items-center gap-4">
                         <button className="flex items-center gap-1 text-muted-foreground hover:text-primary transition-colors">
                           <Heart className="h-4 w-4" />
-                          <span className="text-sm">{post.likes}</span>
+                          <span className="text-sm">{post?.likes || 0}</span>
                         </button>
                         <button className="flex items-center gap-1 text-muted-foreground hover:text-primary transition-colors">
                           <MessageCircle className="h-4 w-4" />
-                          <span className="text-sm">{post.comments}</span>
+                          <span className="text-sm">{0}</span>
                         </button>
                         <button className="text-muted-foreground hover:text-primary transition-colors">
                           <Share2 className="h-4 w-4" />

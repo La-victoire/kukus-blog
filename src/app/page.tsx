@@ -17,8 +17,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
 import { ArrowRight, ChevronRight, Heart, MessageCircle, Share2, Search, Menu, X } from "lucide-react"
 import { cn } from "@/lib/utils"
+import Navbar from "./components/Navbar";
 
-const fetcher = (url: string) => getData<any>(url);
+const fetcher = async (url: string) => await getData<any>(url);
 
 
 const DataComponent = () => { 
@@ -64,7 +65,7 @@ const DataComponent = () => {
   return (
     <>
     
-
+    <Navbar />
     <Hero />
     <br />
     <div className=" pl-10">
@@ -124,7 +125,7 @@ const DataComponent = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <BlogCard posts={posts} key={posts._id}/>
+            <BlogCard posts={posts} key={Math.random()*10}/>
           </div>
 
           <div className="mt-12 text-center">

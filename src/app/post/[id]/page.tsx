@@ -65,7 +65,7 @@ export default function BlogPost() {
     <main className="min-h-screen pb-16">
       {/* Cover image with title overlay */}
       <div className="relative h-[50vh] w-full">
-        <Image src={posts?.coverImage || "/placeholder.svg"} alt={posts?.title} fill className="object-cover" priority />
+        <Image src={"/project_pics/abstract-5719221.jpg"} alt={posts?.title} fill className="object-cover" priority />
         <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
           <div className="container max-w-4xl px-4 text-center">
             <h1 className="text-3xl md:text-5xl font-bold text-white mb-4">{posts?.title}</h1>
@@ -107,10 +107,10 @@ export default function BlogPost() {
 
           {/* Blog content */}
           <article className="prose prose-gray dark:prose-invert max-w-none">
-            {posts?.content?.map((text:any)=> (<div>
+            {posts?.content?.map((text:any)=> (
             <div key={text._id}
             dangerouslySetInnerHTML={{ __html:text.value }} />
-            </div>))}
+            ))}
           </article>
         </div>
       </div>

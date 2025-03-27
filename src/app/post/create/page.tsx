@@ -55,10 +55,10 @@ export default function CreateBlogPage() {
 
   return (
     <div className="container max-w-4xl py-12">
-      <Link href="/profile">
+      <Link href="/">
         <Button variant="ghost" size="sm" className="mb-6">
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to profile
+          Back to home
         </Button>
       </Link>
 
