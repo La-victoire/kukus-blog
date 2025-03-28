@@ -16,13 +16,14 @@ import { postData } from "@/utils/api"
 export default function CreateBlogPage() {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [coverImage, setCoverImage] = useState<any | null>(null)
+  const [preview, setPreview] = useState<any | null>(null)
+  const [coverImg, setCoverImg] = useState<any | null>(null)
   const [formData, setFormData] = useState({
     title: "",
     description:"",
     categories:"",
     content: "",
-    coverImage: coverImage 
+    coverImage: coverImg 
   })
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -30,9 +31,10 @@ export default function CreateBlogPage() {
     if (file) {
       // In a real app, you would upload this to a server and get a URL back
       // For this example, we'll use a placeholder
-      setCoverImage(file)
       console.log(file)
-      console.log(coverImage)
+      setFormData((prev) => ({ ...prev, coverImage:file,}))
+      setPreview(URL.createObjectURL(file))
+      console.log(formData)
     }
   }
 
@@ -76,10 +78,10 @@ export default function CreateBlogPage() {
                 className="border-2 border-dashed rounded-lg p-4 text-center cursor-pointer hover:bg-muted/50 transition-colors"
                 onClick={() => document.getElementById("cover-image")?.click()}
               >
-                {coverImage ? (
+                {preview ? (
                   <div className="relative aspect-video w-full overflow-hidden rounded-md">
                     <img
-                      src={coverImage || "/placeholder.svg"}
+                      src={preview || "/placeholder.svg"}
                       alt="Cover preview"
                       className="object-cover w-full h-full"
                     />

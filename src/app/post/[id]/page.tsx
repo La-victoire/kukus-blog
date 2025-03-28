@@ -8,6 +8,7 @@ import Link from "next/link"
 import { getData } from "@/utils/api"
 import { useParams } from "next/navigation"
 import useSWR from "swr"
+import { CommentSection } from "@/app/components/comments/comment-section"
 
 // const getBlogPost = () => {
 
@@ -45,7 +46,6 @@ import useSWR from "swr"
 //     },
 //   }
 // }
-
 
 export default function BlogPost() {
 
@@ -112,6 +112,10 @@ export default function BlogPost() {
             dangerouslySetInnerHTML={{ __html:text.value }} />
             ))}
           </article>
+
+          <div className="mt-12 border-t">
+            <CommentSection postId={posts._id} initialComments={sampleComments} />
+          </div>
         </div>
       </div>
     </main>
