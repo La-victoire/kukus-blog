@@ -15,7 +15,7 @@ import { Switch } from "@/components/ui/switch"
 import { ArrowLeft, X, Loader2, ImageIcon } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
-import { DeletePostDialog } from "@/components/blog/delete-post-dialog"
+import { DeletePostDialog } from "@/app/components/blog/delete-blog-dialog"
 
 // Sample post data
 const getPostData = (id: string) => {

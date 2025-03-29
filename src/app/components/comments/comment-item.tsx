@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-// import { formatDistanceToNow } from "date-fns"
+import { formatDistanceToNow } from "date-fns"
 import type { Comment } from "./comment-section"
 import { CommentForm } from "./comment-form"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
