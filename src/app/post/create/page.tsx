@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation"
 import { ArrowLeft, ImageIcon, Loader2 } from "lucide-react"
 import Link from "next/link"
 import { postData } from "@/utils/api"
+import { title } from "process"
 
 export default function CreateBlogPage() {
   const router = useRouter()
@@ -25,6 +26,13 @@ export default function CreateBlogPage() {
     content: "",
     coverImage: coverImg 
   })
+  const formInfo = new FormData();
+
+  formInfo.append( "title",formData.title)
+  formInfo.append("description" ,formData.description)
+  formInfo.append("categories",formData.categories)
+  formInfo.append( "content",formData.content)
+  formInfo.append( "coverImage",formData.coverImage)
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -43,9 +51,9 @@ export default function CreateBlogPage() {
     setIsSubmitting(true)
     try {
       console.log(formData)
-      const data:any = await postData("/create",formData)
+      const data:any = await postData("/create",formInfo)
       console.log(data)
-      const userId = data.user._id
+      const userId = data.user
        if (userId) {
          router.push(`/post/${userId}`)
        }

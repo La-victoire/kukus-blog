@@ -3,7 +3,7 @@ import axios, { AxiosRequestConfig } from "axios";
 const postsApi = axios.create({
   baseURL: "https://kuku-api-production.up.railway.app/v1/posts",
   headers : {
-    "Content-Type":"application/json",
+    "Content-Type":"multipart/form-data",
   },
   withCredentials:true
 });
