@@ -1,15 +1,24 @@
 "use client"
 import Image from 'next/image'
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Link from "next/link"
 import { ArrowRight, Menu, Search, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
-
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [user, setUser] = useState<any>()
   const headerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const getCookie = (name:any) => {
+      const match = document.cookie.match(new RegExp(`(^| )${name}=([^;]+)`));
+      return match ? match[2] : null;
+    };
+
+    setUser(getCookie("user"));
+  }, []);
 
   return (
     <>
@@ -20,7 +29,7 @@ const Navbar = () => {
         ref={headerRef}
         className="relative h-screen max-h-[800px] w-full overflow-hidden"
       >
-      <div className='flex z-10 absolute text-white items-center top-5 w-full justify-between justify-items-center px-10'>
+      <div className='flex z-20 absolute text-white items-center top-5 w-full justify-between justify-items-center px-10'>
         <div>
           <img src="/K_20250309_145243_0000.png" alt="logo" 
           className='w-14 h-auto rounded-full'
@@ -35,9 +44,19 @@ const Navbar = () => {
           <div>TRENDING</div>
           <div>CONTACT</div>
         </div>
-        <Link href={`/profile/sign-in`}>
-         SIGN UP
+        <div>
+          {user ? (
+            <p>
+              Welcome {user}
+            </p>
+          ) : (
+        <Link href="/profile/sign-in">
+         <button className='cursor-pointer'>
+          SIGN UP
+          </button> 
         </Link>
+          )}
+        </div>
         <div>
         <button 
                 className="md:hidden text-white"
