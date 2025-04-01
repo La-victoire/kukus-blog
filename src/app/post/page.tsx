@@ -228,7 +228,7 @@ export default function BlogPage() {
                   <SelectValue placeholder="Category" />
                 </SelectTrigger>
                 <SelectContent>
-                  {posts.map((post:any) => (
+                  {posts?.map((post:any) => (
                     <SelectItem key={post._id} value={post.categories}>
                       {post.categories}
                     </SelectItem>
@@ -248,7 +248,7 @@ export default function BlogPage() {
               </Select>
             </div>
             <div className="text-sm text-muted-foreground">
-              Showing {posts.length} of {posts.length} articles
+              Showing {posts?.length} of {posts?.length} articles
             </div>
           </div>
         </div>
@@ -258,7 +258,7 @@ export default function BlogPage() {
       <section className="py-12">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredPosts.map((post) => (
+            {filteredPosts?.map((post) => (
               <Card key={post.id} className="overflow-hidden group h-full transition-all duration-300 hover:shadow-lg">
                 <div className="relative h-56">
                   <Image
@@ -308,7 +308,7 @@ export default function BlogPage() {
             ))}
           </div>
 
-          {filteredPosts.length === 0 && (
+          {filteredPosts?.length === 0 && (
             <div className="text-center py-12">
               <h3 className="text-xl font-medium mb-2">No articles found</h3>
               <p className="text-muted-foreground mb-4">Try adjusting your search or filter criteria</p>
@@ -324,7 +324,7 @@ export default function BlogPage() {
             </div>
           )}
 
-          {filteredPosts.length > 0 && (
+          {filteredPosts?.length > 0 && (
             <div className="mt-12 text-center">
               <Button variant="outline" size="lg">
                 Load More
