@@ -10,16 +10,10 @@ const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [user, setUser] = useState<any>()
   const headerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const getCookie = (name:any) => {
-      const match = document.cookie.match(new RegExp(`(^| )${name}=([^;]+)`));
-      return match ? match[2] : null;
-    };
-
-    setUser(getCookie("user"));
-  }, []);
-
+  useEffect(()=> {
+    const session = sessionStorage.getItem("user")
+    setUser(session ? JSON.parse(session) : null)
+  },[])
   return (
     <>
     <div className='items-center z-0 text-foreground'>
@@ -46,9 +40,11 @@ const Navbar = () => {
         </div>
         <div>
           {user ? (
+            <Link href={`/profile/${user.id}`}>
             <p>
-              Welcome {user}
+              Welcome {user.name}
             </p>
+            </Link>
           ) : (
         <Link href="/profile/sign-in">
          <button className='cursor-pointer'>
@@ -96,21 +92,21 @@ const Navbar = () => {
                     Home
                   </Link>
                   <Link 
-                    href="/blog" 
+                    href="/post" 
                     className="text-white hover:text-primary transition-colors py-2"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Blog
                   </Link>
                   <Link 
-                    href="/about" 
+                    href="#about" 
                     className="text-white hover:text-primary transition-colors py-2"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     About
                   </Link>
                   <Link 
-                    href="/contact" 
+                    href="#contact" 
                     className="text-white hover:text-primary transition-colors py-2"
                     onClick={() => setMobileMenuOpen(false)}
                   >
@@ -118,20 +114,13 @@ const Navbar = () => {
                   </Link>
                 </nav>
                 <div className="flex flex-col space-y-4">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                    <Input 
-                      placeholder="Search..." 
-                      className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/50"
-                    />
-                  </div>
                   <div className="flex space-x-4">
                     <Link href="/auth" className="flex-1">
-                      <Button variant="outline" className="w-full border-white text-white hover:bg-white hover:text-black">
+                      <Button variant="outline" className="w-full border-white text-black hover:bg-transparent hover:text-white">
                         Sign In
                       </Button>
                     </Link>
-                    <Link href="/auth?tab=signup" className="flex-1">
+                    <Link href="/profile?tab=signup" className="flex-1">
                       <Button className="w-full">Get Started</Button>
                     </Link>
                   </div>
@@ -144,7 +133,7 @@ const Navbar = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-2xl">
               <h1 className="text-4xl md:text-6xl font-bold mb-4 leading-tight">
-                Discover Stories That <span className="text-primary">Inspire</span>
+                Discover Stories That <span className="text-orange-300">Inspire</span>
               </h1>
               <p className="text-xl  mb-8">
                 Explore thought-provoking articles on topics that matter. Join our community of curious minds.
@@ -157,7 +146,7 @@ const Navbar = () => {
                   </Button>
                 </Link>
                 <Link href="/post/create">
-                  <Button size="lg" variant="outline" className="w-full sm:w-auto border-white text-white hover:bg-white hover:text-black">
+                  <Button size="lg" variant="outline" className="w-full sm:w-auto border-white text-primary hover:bg-transparent hover:text-white">
                     Start Writing
                   </Button>
                 </Link>

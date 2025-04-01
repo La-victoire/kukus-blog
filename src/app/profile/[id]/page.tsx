@@ -122,6 +122,9 @@ export default function ProfilePage () {
 
         {/* Main content */}
         <div className="space-y-6">
+          <Link href="/">
+          <p className="text-sm mb-3"> Go Back To HomePage</p>
+          </Link>
           <Tabs defaultValue="posts">
             <TabsList>
               <TabsTrigger value="posts">My Posts</TabsTrigger>

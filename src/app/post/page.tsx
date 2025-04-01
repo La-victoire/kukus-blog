@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -10,6 +10,8 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Search, Filter, Calendar, Clock } from "lucide-react"
+import { getData } from "@/utils/api"
+import useSWR from "swr"
 
 // Sample blog posts data
 const allPosts = [
@@ -156,31 +158,38 @@ const categories = [
   "Fashion",
 ]
 
+
+
+
 export default function BlogPage() {
+  const fetcher = async (url: string) => await getData<any>(url);
+  const { data:posts, error:postError, isLoading:postsLoading } = useSWR("/view", fetcher);
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedCategory, setSelectedCategory] = useState("All Categories")
   const [sortBy, setSortBy] = useState("newest")
 
-  // Filter and sort posts
-  const filteredPosts = allPosts
-    .filter((post) => {
-      const matchesSearch =
-        post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        post.excerpt.toLowerCase().includes(searchQuery.toLowerCase())
-      const matchesCategory = selectedCategory === "All Categories" || post.category === selectedCategory
+    console.log(posts)
+  
 
-      return matchesSearch && matchesCategory
-    })
-    .sort((a, b) => {
-      if (sortBy === "newest") {
-        return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
-      } else if (sortBy === "oldest") {
-        return new Date(a.publishedAt).getTime() - new Date(b.publishedAt).getTime()
-      } else if (sortBy === "readTime") {
-        return Number.parseInt(b.readTime) - Number.parseInt(a.readTime)
-      }
-      return 0
-    })
+    // Filter and sort posts
+    const filteredPosts = posts.map
+      .filter((post:any) => {
+        const matchesSearch =
+          post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          post.description.toLowerCase().includes(searchQuery.toLowerCase())
+        const matchesCategory = selectedCategory === "All Categories" || post.categories === selectedCategory
+  
+        return matchesSearch && matchesCategory
+      })
+      .sort((a, b) => {
+        if (sortBy === "newest") {
+          return new Date(b.createdAt).getTime() - new Date(a.publishedAt).getTime()
+        } else if (sortBy === "oldest") {
+          return new Date(a.createdAt).getTime() - new Date(b.publishedAt).getTime()
+        }
+        return 0
+      })
+
 
   return (
     <main className="min-h-screen pb-16">
@@ -219,9 +228,9 @@ export default function BlogPage() {
                   <SelectValue placeholder="Category" />
                 </SelectTrigger>
                 <SelectContent>
-                  {categories.map((category) => (
-                    <SelectItem key={category} value={category}>
-                      {category}
+                  {posts.map((post:any) => (
+                    <SelectItem key={post._id} value={post.categories}>
+                      {post.categories}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -239,7 +248,7 @@ export default function BlogPage() {
               </Select>
             </div>
             <div className="text-sm text-muted-foreground">
-              Showing {filteredPosts.length} of {allPosts.length} articles
+              Showing {posts.length} of {posts.length} articles
             </div>
           </div>
         </div>
@@ -265,7 +274,7 @@ export default function BlogPage() {
                   )}
                   <div className="absolute top-4 left-4 z-10">
                     <Badge variant="outline" className="bg-white/80 hover:bg-white">
-                      {post.category}
+                      {post.categories}
                     </Badge>
                   </div>
                 </div>
@@ -273,26 +282,22 @@ export default function BlogPage() {
                   <div className="flex items-center gap-4 mb-3">
                     <div className="flex items-center gap-1 text-sm text-muted-foreground">
                       <Calendar className="h-3 w-3" />
-                      <span>{post.publishedAt}</span>
-                    </div>
-                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                      <Clock className="h-3 w-3" />
-                      <span>{post.readTime}</span>
+                      <span>{post.createdAt}</span>
                     </div>
                   </div>
-                  <Link href={`/blog/${post.id}`}>
+                  <Link href={`/post/${post._id}`}>
                     <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">{post.title}</h3>
                   </Link>
                   <p className="text-muted-foreground mb-4 line-clamp-2">{post.excerpt}</p>
                   <div className="flex items-center justify-between mt-auto">
                     <div className="flex items-center gap-2">
                       <Avatar className="h-8 w-8">
-                        <AvatarImage src={post.author.image} alt={post.author.name} />
-                        <AvatarFallback>{post.author.name.charAt(0)}</AvatarFallback>
+                        <AvatarImage src={post.user.profile_img} alt={post.user.name || post.user.firstname} />
+                        <AvatarFallback>{post.user.name.charAt(0)}</AvatarFallback>
                       </Avatar>
-                      <span className="text-sm font-medium">{post.author.name}</span>
+                      <span className="text-sm font-medium">{post.user.name || post.user.firstname}</span>
                     </div>
-                    <Link href={`/blog/${post.id}`}>
+                    <Link href={`/post/${post.id}`}>
                       <Button variant="ghost" size="sm" className="text-primary">
                         Read More
                       </Button>

@@ -1,9 +1,8 @@
 "use client"
-
+import { motion } from "framer-motion"
 import useSWR from "swr";
 import { getData } from "../utils/api"; // Import our API helper
 import Hero from "./components/Hero";
-import Trending from "./components/Trending";
 import { getUser } from "@/utils/userApi";
 import { BlogCard } from "./components/BlogCard";
 import { useEffect, useState, useRef } from "react"
@@ -59,7 +58,16 @@ const DataComponent = () => {
     setValue(value);
   }
 
-  if (postsLoading) return <p>Loading...</p>;
+  if (postsLoading) return (
+    <div className="flex items-center justify-center h-screen bg-gray-100">
+    <motion.div
+      className="w-12 h-12 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    ></motion.div>
+  </div>
+  );
   if (postError) return <p>Error loading data</p>;
 
   return (

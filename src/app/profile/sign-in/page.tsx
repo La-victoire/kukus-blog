@@ -50,8 +50,11 @@ export default function AuthPage() {
       const data:any = await profile("/signin",enterProfile)
       console.log(data)
       const userId = data.existingUser._id
+      const userName = data.existingUser.name
+      const userPic = data.existingUser.profile_img
       setIsLoading(false)
        if (userId) {
+          sessionStorage.setItem("user", JSON.stringify({name:userName,image:userPic, id:userId}))
          router.push(`/profile/${userId}`)
        }
     } catch (error) {
