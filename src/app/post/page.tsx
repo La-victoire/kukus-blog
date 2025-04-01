@@ -172,7 +172,7 @@ export default function BlogPage() {
   
 
     // Filter and sort posts
-    const filteredPosts = posts?.map
+    const filteredPosts = posts?
       .filter((post:any) => {
         const matchesSearch =
           post?.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -183,9 +183,9 @@ export default function BlogPage() {
       })
       .sort((a, b) => {
         if (sortBy === "newest") {
-          return new Date(b.createdAt).getTime() - new Date(a.publishedAt).getTime()
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         } else if (sortBy === "oldest") {
-          return new Date(a.createdAt).getTime() - new Date(b.publishedAt).getTime()
+          return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
         }
         return 0
       })
