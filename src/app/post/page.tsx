@@ -172,11 +172,11 @@ export default function BlogPage() {
   
 
     // Filter and sort posts
-    const filteredPosts = posts.map
+    const filteredPosts = posts?.map
       .filter((post:any) => {
         const matchesSearch =
-          post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          post.description.toLowerCase().includes(searchQuery.toLowerCase())
+          post?.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          post?.description.toLowerCase().includes(searchQuery.toLowerCase())
         const matchesCategory = selectedCategory === "All Categories" || post.categories === selectedCategory
   
         return matchesSearch && matchesCategory
