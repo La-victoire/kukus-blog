@@ -46,7 +46,7 @@ console.log(posts.map((post)=>post._id))
                     index === 0 ? "h-80" : "h-56"
                   )}>
                     <Image
-                      src={ "/project_pics/abstract-5719221.jpg"}
+                      src={ `post.coverImage.map((img)=> (img.value)) || /project_pics/abstract-5719221.jpg`}
                       alt={post.title}
                       fill
                       className="object-cover transition-transform duration-500 group-hover:scale-105"
