@@ -46,7 +46,7 @@ console.log(posts.map((post)=>post._id))
                     index === 0 ? "h-80" : "h-56"
                   )}>
                     <Image
-                      src={ `post.coverImage.map((img)=> (img.value)) || /project_pics/abstract-5719221.jpg`}
+                      src={ `post?.coverImage?.map((img)=> (img?.value)) || /project_pics/abstract-5719221.jpg`}
                       alt={post.title}
                       fill
                       className="object-cover transition-transform duration-500 group-hover:scale-105"
@@ -65,10 +65,10 @@ console.log(posts.map((post)=>post._id))
                   <CardContent className="p-6 bg-white dark:bg-gray-950">
   <div className="flex items-center gap-3">
                           <Avatar>
-                            <AvatarImage src={post.author.image} alt={post.author.name} />
-                            <AvatarFallback>{post.author.name.charAt(0)}</AvatarFallback>
+                            <AvatarImage src={post?.user?.profile_img} alt={post?.user?.name} />
+                            <AvatarFallback>{post?.user?.name.charAt(0)}</AvatarFallback>
                           </Avatar>
-                          <span className="text-white">{post.author.name}</span>
+                          <span className="text-white">{post?.user?.name || post?.user?.firstname }</span>
                         </div>
                     <div className="flex items-center justify-between mb-3 text-sm text-muted-foreground">
                       <span>{properDate(post.createdAt)}</span>
