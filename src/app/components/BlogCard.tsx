@@ -63,6 +63,13 @@ console.log(posts.map((post)=>post._id))
                     </div>
                   </div>
                   <CardContent className="p-6 bg-white dark:bg-gray-950">
+  <div className="flex items-center gap-3">
+                          <Avatar>
+                            <AvatarImage src={post.author.image} alt={post.author.name} />
+                            <AvatarFallback>{post.author.name.charAt(0)}</AvatarFallback>
+                          </Avatar>
+                          <span className="text-white">{post.author.name}</span>
+                        </div>
                     <div className="flex items-center justify-between mb-3 text-sm text-muted-foreground">
                       <span>{properDate(post.createdAt)}</span>
                       <span>10 mins</span>
