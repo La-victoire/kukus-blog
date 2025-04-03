@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Pencil, Plus } from "lucide-react"
+import { ArrowLeft, Pencil, Plus } from "lucide-react"
 import Link from "next/link"
 import useSWR from "swr"
 import { getUser, postAdminSession } from "@/utils/userApi"
@@ -68,7 +68,6 @@ export default function ProfilePage () {
   const postUser = posts?.filter((item:any)=>(
     item?.user?._id === id
   ))
-  console.log(posts)
   const handleProfileUpdate = (e: React.FormEvent) => {
     e.preventDefault()
     // In a real app, you would send this data to your backend
@@ -122,8 +121,11 @@ export default function ProfilePage () {
 
         {/* Main content */}
         <div className="space-y-6">
-          <Link href="/">
-          <p className="text-sm mb-3"> Go Back To HomePage</p>
+        <Link href="/">
+            <Button variant="ghost" size="sm" className="mb-6">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Home Page
+            </Button>
           </Link>
           <Tabs defaultValue="posts">
             <TabsList>
@@ -135,18 +137,12 @@ export default function ProfilePage () {
             <TabsContent value="posts" className="space-y-6">
               <div className="flex justify-between items-center">
                 <h2 className="text-2xl font-bold">My Blog Posts</h2>
-                <Link href="/create-blog">
-                  <Button>
-                    <Plus className="mr-2 h-4 w-4" />
-                    New Post
-                  </Button>
-                </Link>
               </div>
 
               {postUser?.length > 0 ? (
                 <div className="grid gap-6">
-                  {postUser?.map((post) => (
-                    <Card key={post.id}>
+                  {postUser?.map((post:any) => (
+                    <Card key={post._id}>
                       <div className="flex flex-col md:flex-row">
                         <div className="relative h-48 md:h-auto md:w-48 shrink-0">
                           <img

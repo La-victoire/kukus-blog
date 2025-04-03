@@ -168,12 +168,12 @@ export default function BlogPage() {
   const [selectedCategory, setSelectedCategory] = useState("All Categories")
   const [sortBy, setSortBy] = useState("newest")
 
-    console.log(posts)
   
+  const uniqueCategories = posts?.map((post:any) => post?.categories).filter((categories:any,index:any,self:any) => self.indexOf(categories) === index) 
+  console.log(uniqueCategories)
 
     // Filter and sort posts
-    const filteredPosts = posts?
-      .filter((post:any) => {
+    const filteredPosts = posts?.filter((post:any) => {
         const matchesSearch =
           post?.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
           post?.description.toLowerCase().includes(searchQuery.toLowerCase())
@@ -228,9 +228,9 @@ export default function BlogPage() {
                   <SelectValue placeholder="Category" />
                 </SelectTrigger>
                 <SelectContent>
-                  {posts?.map((post:any) => (
-                    <SelectItem key={post._id} value={post.categories}>
-                      {post.categories}
+                  {uniqueCategories?.map((post:any, index) => (
+                    <SelectItem key={index} value={post}>
+                      {post}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -248,7 +248,7 @@ export default function BlogPage() {
               </Select>
             </div>
             <div className="text-sm text-muted-foreground">
-              Showing {posts?.length} of {posts?.length} articles
+              Showing {filteredPosts?.length} of {posts?.length} articles
             </div>
           </div>
         </div>
@@ -259,10 +259,10 @@ export default function BlogPage() {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredPosts?.map((post) => (
-              <Card key={post.id} className="overflow-hidden group h-full transition-all duration-300 hover:shadow-lg">
+              <Card key={post._id} className="overflow-hidden group h-full transition-all duration-300 hover:shadow-lg">
                 <div className="relative h-56">
                   <Image
-                    src={post.coverImage || "/placeholder.svg"}
+                    src={post?.coverImage.map((img)=>img.value).join("") || "/project_pics/abstract-5719221.jpg"}
                     alt={post.title}
                     fill
                     className="object-cover transition-transform duration-500 group-hover:scale-105"
@@ -288,16 +288,16 @@ export default function BlogPage() {
                   <Link href={`/post/${post._id}`}>
                     <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">{post.title}</h3>
                   </Link>
-                  <p className="text-muted-foreground mb-4 line-clamp-2">{post.excerpt}</p>
+                  <p className="text-muted-foreground mb-4 line-clamp-2">{post?.description}</p>
                   <div className="flex items-center justify-between mt-auto">
                     <div className="flex items-center gap-2">
                       <Avatar className="h-8 w-8">
-                        <AvatarImage src={post.user.profile_img} alt={post.user.name || post.user.firstname} />
-                        <AvatarFallback>{post.user.name.charAt(0)}</AvatarFallback>
+                        <AvatarImage src={post?.user?.profile_img} alt={post?.user?.name || post?.user?.firstname} />
+                        <AvatarFallback>{post?.user?.name?.charAt(0)}</AvatarFallback>
                       </Avatar>
-                      <span className="text-sm font-medium">{post.user.name || post.user.firstname}</span>
+                      <span className="text-sm font-medium">{post?.user?.name || post?.user?.firstname}</span>
                     </div>
-                    <Link href={`/post/${post.id}`}>
+                    <Link href={`/post/${post?._id}`}>
                       <Button variant="ghost" size="sm" className="text-primary">
                         Read More
                       </Button>
@@ -324,9 +324,9 @@ export default function BlogPage() {
             </div>
           )}
 
-          {filteredPosts?.length > 0 && (
+          {filteredPosts?.length < posts?.length && (
             <div className="mt-12 text-center">
-              <Button variant="outline" size="lg">
+              <Button onClick={()=>(setSearchQuery(""))} variant="outline" size="lg">
                 Load More
               </Button>
             </div>

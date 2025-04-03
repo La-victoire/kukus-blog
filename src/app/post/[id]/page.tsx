@@ -65,7 +65,7 @@ export default function BlogPost() {
     <main className="min-h-screen pb-16">
       {/* Cover image with title overlay */}
       <div className="relative h-[50vh] w-full">
-        <Image src={"/project_pics/abstract-5719221.jpg"} alt={posts?.title} fill className="object-cover" priority />
+        <Image src={posts?.coverImage?.map((img:any)=>img.value).join('') || "/project_pics/abstract-5719221.jpg"} alt={posts?.title} fill className="object-cover" priority />
         <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
           <div className="container max-w-4xl px-4 text-center">
             <h1 className="text-3xl md:text-5xl font-bold text-white mb-4">{posts?.title}</h1>
@@ -74,10 +74,7 @@ export default function BlogPost() {
                 <Calendar className="w-4 h-4" />
                 <span>{properDate(posts?.createdAt)}</span>
               </div>
-              <div className="flex items-center gap-1">
-                <Clock className="w-4 h-4" />
-                <span>{posts?.readTime}</span>
-              </div>
+             
             </div>
           </div>
         </div>
@@ -86,7 +83,7 @@ export default function BlogPost() {
       {/* Blog content */}
       <div className="container max-w-4xl px-4 mx-auto -mt-16 relative">
         <div className="bg-background rounded-lg shadow-lg p-6 md:p-8">
-          <Link href="/">
+          <Link href="/post">
             <Button variant="ghost" size="sm" className="mb-6">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to all posts
@@ -114,7 +111,7 @@ export default function BlogPost() {
           </article>
 
           <div className="mt-12 border-t">
-            <CommentSection postId={posts._id} initialComments={sampleComments} />
+            <CommentSection postId={posts?._id} initialComments={posts?.comments?.map((talk:any)=> talk || "")} />
           </div>
         </div>
       </div>

@@ -68,7 +68,29 @@ const DataComponent = () => {
     ></motion.div>
   </div>
   );
-  if (postError) return <p>Error loading data</p>;
+  if (postError) return(
+    <div className="flex flex-col items-center justify-center h-screen bg-primary text-orange-300">
+    <motion.h1
+      className="text-4xl font-bold"
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      Oops!
+    </motion.h1>
+    <motion.p
+      className="mt-2 text-lg"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ delay: 0.2, duration: 0.5 }}
+    >
+      Something went wrong
+    </motion.p>
+    <Button className="mt-4 bg-background hover:bg-foreground text-foreground hover:text-white" onClick={() => window.location.reload()}>
+      Reload Page
+    </Button>
+  </div>
+  ) ;
 
   return (
     <>
@@ -118,7 +140,7 @@ const DataComponent = () => {
             </div>
             <div className="mt-4 md:mt-0 flex flex-wrap gap-2">
               {posts.slice(0, 5).map((post:any) => (
-                <Link href={`/post}`} key={post._id}>
+                <Link href={`/post`} key={post._id}>
                   <Badge variant="outline" className="hover:bg-primary/10 transition-colors">
                     {post.categories}
                   </Badge>

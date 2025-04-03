@@ -5,6 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
 import { cn } from "@/lib/utils"
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
 interface posts {
   title : string,
@@ -16,6 +17,7 @@ interface posts {
   likes: number,
   comments: any,
   createdAt: any,
+  coverImage: any,
 }
 
 interface blogCardPost {
@@ -30,7 +32,7 @@ export const BlogCard = ({posts} : blogCardPost) => {
     });
   };
 console.log(posts._id)
-console.log(posts.map((post)=>post._id))
+console.log(posts?.map((post)=>post?.user?.name || post?.user?.firstname))
   return (
     <>
         {Array.isArray(posts) && ( posts?.map((post:posts, index:any) => (
@@ -46,7 +48,7 @@ console.log(posts.map((post)=>post._id))
                     index === 0 ? "h-80" : "h-56"
                   )}>
                     <Image
-                      src={ `post?.coverImage?.map((img)=> (img?.value)) || /project_pics/abstract-5719221.jpg`}
+                      src={ post?.coverImage?.map((img)=> (img?.value)).join('') || "/project_pics/abstract-5719221.jpg"}
                       alt={post.title}
                       fill
                       className="object-cover transition-transform duration-500 group-hover:scale-105"
@@ -63,12 +65,12 @@ console.log(posts.map((post)=>post._id))
                     </div>
                   </div>
                   <CardContent className="p-6 bg-white dark:bg-gray-950">
-  <div className="flex items-center gap-3">
+                        <div className="flex items-center justify-between -mt-8">
                           <Avatar>
                             <AvatarImage src={post?.user?.profile_img} alt={post?.user?.name} />
-                            <AvatarFallback>{post?.user?.name.charAt(0)}</AvatarFallback>
+                            <AvatarFallback>{post?.user?.name?.charAt(0)}</AvatarFallback>
                           </Avatar>
-                          <span className="text-white">{post?.user?.name || post?.user?.firstname }</span>
+                          <span className="text-muted-foreground">{post?.user?.username || post?.user?.name || post?.user?.firstname }</span>
                         </div>
                     <div className="flex items-center justify-between mb-3 text-sm text-muted-foreground">
                       <span>{properDate(post.createdAt)}</span>
