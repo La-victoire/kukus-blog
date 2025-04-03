@@ -170,7 +170,6 @@ export default function BlogPage() {
 
   
   const uniqueCategories = posts?.map((post:any) => post?.categories).filter((categories:any,index:any,self:any) => self.indexOf(categories) === index) 
-  console.log(uniqueCategories)
 
     // Filter and sort posts
     const filteredPosts = posts?.filter((post:any) => {
