@@ -26,7 +26,7 @@ type ApiResponse<T> = {
 };
 
 // GET Request from this Api
-export const getData = async <T>(endpoint: string, params?: string): Promise<T> => {
+export const getData = async <T>(endpoint: any, params?: string): Promise<T> => {
   try {
     const response = await postsApi.get<ApiResponse<T>>(endpoint, {params});
     return response.data.data;

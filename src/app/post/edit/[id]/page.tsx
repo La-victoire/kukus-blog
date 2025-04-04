@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -16,9 +16,11 @@ import { ArrowLeft, X, Loader2, ImageIcon } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { DeletePostDialog } from "@/app/components/blog/delete-blog-dialog"
+import { getData } from "@/utils/api"
+import useSWR from "swr"
 
 // Sample post data
-const getPostData = (id: string) => {
+const getPostData = (id:any) => {
   return {
     id,
     title: "The Future of Web Development",
@@ -42,7 +44,7 @@ Serverless architectures continue to gain traction, offering developers a way to
 
 As serverless platforms mature, we're seeing more sophisticated offerings that address previous limitations around cold starts, long-running processes, and state management. This evolution is making serverless a viable option for an increasingly broad range of applications.`,
     excerpt: "Explore how remote work is evolving and what to expect in the coming years for distributed teams.",
-    coverImage: "/placeholder.svg?height=800&width=1600",
+    coverImage: "/project_pics/abstract-5719221.jpg",
     category: "Technology",
     tags: ["Web Development", "AI", "WebAssembly", "Serverless"],
     publishedAt: "2025-03-14T10:00:00Z",
@@ -66,16 +68,22 @@ const categories = [
   "Science",
 ]
 
-export default function EditPostPage({ params }: { params: { id: string } }) {
+const fetcher = (url: string) => getData<any>(url);
+
+export default function EditPostPage() {
+  const params = useParams()
+  const id = params.id
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-  const [postData, setPostData] = useState(getPostData(params.id))
-  const [tags, setTags] = useState<string[]>(postData.tags)
+  const { data:postData, error:postError, isLoading:postLoading } = useSWR(id,fetcher);
+  const [tags, setTags] = useState<string[]>(postData?.tags)
   const [newTag, setNewTag] = useState("")
+  const [prevImage, setPrevImage] = useState<string | null>(postData?.coverImage.map((img:any)=> img.value).join(""))
   const [coverImageFile, setCoverImageFile] = useState<File | null>(null)
   const [coverImagePreview, setCoverImagePreview] = useState<string | null>(null)
-
+  
+  console.log(postData)
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setPostData({
@@ -123,6 +131,17 @@ export default function EditPostPage({ params }: { params: { id: string } }) {
       reader.readAsDataURL(file)
     }
   }
+  const formInfo = new FormData();
+  
+  formInfo.append( "title",postData?.title )
+  formInfo.append("description" ,postData?.excerpt)
+  formInfo.append("categories" ,postData?.category)
+  formInfo.append("tags" ,JSON.stringify(newTag))
+  formInfo.append("coverImage" ,coverImageFile || postData?.coverImage || " ")
+  formInfo.append("content" ,postData?.content)
+  formInfo.append("updatedAt" ,postData?.publishedAt)
+
+
 
   const handleSubmit = async (e: React.FormEvent, action: "save" | "publish" | "draft") => {
     e.preventDefault()
@@ -133,11 +152,14 @@ export default function EditPostPage({ params }: { params: { id: string } }) {
       tags,
       status: action === "publish" ? "published" : action === "draft" ? "draft" : postData.status,
     }
-
+    formInfo.forEach((key, value)=> 
+      console.log(key,":", value)
+    )
+    
     // Simulate API call
     setTimeout(() => {
       setIsSubmitting(false)
-      router.push(`/blog/${params.id}`)
+      // router.push(`/post/${params.id}`)
     }, 1500)
   }
 
@@ -185,10 +207,10 @@ export default function EditPostPage({ params }: { params: { id: string } }) {
               <CardDescription>Upload a high-quality image to represent your post</CardDescription>
             </CardHeader>
             <CardContent>
-              {coverImagePreview || postData.coverImage ? (
+              {coverImagePreview || prevImage ? (
                 <div className="relative aspect-video w-full overflow-hidden rounded-md">
                   <Image
-                    src={coverImagePreview || postData.coverImage}
+                    src={coverImagePreview || prevImage}
                     alt="Cover preview"
                     fill
                     className="object-cover"
@@ -196,11 +218,12 @@ export default function EditPostPage({ params }: { params: { id: string } }) {
                   <Button
                     variant="destructive"
                     size="icon"
-                    className="absolute top-2 right-2"
+                    className="absolute cursor-pointer top-2 right-2"
                     type="button"
                     onClick={() => {
                       setCoverImagePreview(null)
                       setCoverImageFile(null)
+                      setPrevImage(null)
                     }}
                   >
                     <X className="h-4 w-4" />
@@ -238,13 +261,13 @@ export default function EditPostPage({ params }: { params: { id: string } }) {
               {/* Title */}
               <div className="space-y-2">
                 <Label htmlFor="title">Title</Label>
-                <Input id="title" name="title" value={postData.title} onChange={handleInputChange} required />
+                <Input id="title" name="title" value={postData?.title} onChange={handleInputChange} required />
               </div>
 
               {/* Excerpt */}
               <div className="space-y-2">
-                <Label htmlFor="excerpt">Excerpt</Label>
-                <Textarea id="excerpt" name="excerpt" value={postData.excerpt} onChange={handleInputChange} rows={2} />
+                <Label htmlFor="description">Description</Label>
+                <Textarea id="description" name="description" value={postData?.description} onChange={handleInputChange} rows={2} />
                 <p className="text-xs text-muted-foreground">
                   A brief summary of your post. This will be displayed in post previews.
                 </p>
@@ -256,7 +279,7 @@ export default function EditPostPage({ params }: { params: { id: string } }) {
                 <Textarea
                   id="content"
                   name="content"
-                  value={postData.content}
+                  value={postData?.content.map((img:any, index:number)=> {if(index === 0) return img.value})}
                   onChange={handleInputChange}
                   rows={15}
                   className="font-mono"
@@ -270,7 +293,7 @@ export default function EditPostPage({ params }: { params: { id: string } }) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <Label htmlFor="category">Category</Label>
-                  <Select value={postData.category} onValueChange={(value) => handleSelectChange("category", value)}>
+                  <Select value={postData?.categories} onValueChange={(value) => handleSelectChange("category", value)}>
                     <SelectTrigger id="category">
                       <SelectValue placeholder="Select category" />
                     </SelectTrigger>
@@ -286,7 +309,7 @@ export default function EditPostPage({ params }: { params: { id: string } }) {
                 <div className="space-y-2">
                   <Label htmlFor="tags">Tags</Label>
                   <div className="flex flex-wrap gap-2 mb-2">
-                    {tags.map((tag) => (
+                    {tags?.map((tag) => (
                       <Badge key={tag} variant="secondary" className="flex items-center gap-1">
                         {tag}
                         <X className="h-3 w-3 cursor-pointer" onClick={() => handleRemoveTag(tag)} />
@@ -308,43 +331,9 @@ export default function EditPostPage({ params }: { params: { id: string } }) {
             </CardContent>
           </Card>
 
-          {/* Post Settings */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Post Settings</CardTitle>
-              <CardDescription>Configure additional settings for your post</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="featured">Featured Post</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Feature this post on the homepage and in featured sections
-                  </p>
-                </div>
-                <Switch
-                  id="featured"
-                  checked={postData.featured}
-                  onCheckedChange={(checked) => handleSwitchChange("featured", checked)}
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="allowComments">Allow Comments</Label>
-                  <p className="text-sm text-muted-foreground">Let readers comment on this post</p>
-                </div>
-                <Switch
-                  id="allowComments"
-                  checked={postData.allowComments}
-                  onCheckedChange={(checked) => handleSwitchChange("allowComments", checked)}
-                />
-              </div>
-            </CardContent>
-          </Card>
-
           {/* Action Buttons */}
           <div className="flex justify-end gap-4">
-            <Button variant="outline" type="button" onClick={() => router.push(`/blog/${params.id}`)}>
+            <Button variant="outline" type="button" onClick={() => router.push(`/blog/${id}`)}>
               Cancel
             </Button>
             <Button variant="outline" type="button" onClick={(e) => handleSubmit(e, "draft")} disabled={isSubmitting}>
@@ -369,7 +358,7 @@ export default function EditPostPage({ params }: { params: { id: string } }) {
         onOpenChange={setIsDeleteDialogOpen}
         onConfirm={confirmDelete}
         isDeleting={isSubmitting}
-        postTitle={postData.title}
+        postTitle={postData?.title}
       />
     </div>
   )

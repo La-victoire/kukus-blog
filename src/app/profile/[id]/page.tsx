@@ -158,7 +158,7 @@ export default function ProfilePage () {
                           <p className="text-sm text-muted-foreground mt-1">{post.publishedAt}</p>
                           <p className="mt-2">{post.description}</p>
                           <div className="mt-4 flex gap-2">
-                            <Link href={`/edit-blog/${post._id}`}>
+                            <Link href={`/post/edit/${post._id}`}>
                               <Button variant="outline" size="sm">
                                 Edit
                               </Button>

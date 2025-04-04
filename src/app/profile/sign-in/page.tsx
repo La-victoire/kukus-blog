@@ -50,12 +50,14 @@ export default function AuthPage() {
       const data:any = await profile("/signin",enterProfile)
       console.log(data)
       const userId = data.existingUser._id
-      const userName = data.existingUser.name
+      const userName = data.existingUser.name || data.existingUser.firstname
       const userPic = data.existingUser.profile_img
       setIsLoading(false)
        if (userId) {
           sessionStorage.setItem("user", JSON.stringify({name:userName,image:userPic, id:userId}))
          router.push(`/profile/${userId}`)
+       } else {
+        location.reload()
        }
     } catch (error) {
       console.log(error)
@@ -73,8 +75,11 @@ export default function AuthPage() {
       const data:any = await profile("/signup",createProfile)
       console.log(data)
       const userId = data.user._id
+      const userName = data.user.firstname
+      const userPic = data.user.profile_img
       setIsLoading(false)
       if (userId) {
+        sessionStorage.setItem("user", JSON.stringify({name:userName,image:userPic, id:userId}))
         router.push(`/profile/${userId}`)
       }
       if(!userId){
@@ -140,9 +145,6 @@ export default function AuthPage() {
                   </div>
                   <div className="flex items-center space-x-2">
                     <Checkbox id="remember" />
-                    <Label htmlFor="remember" className="text-sm font-normal">
-                      Remember me
-                    </Label>
                   </div>
                 </CardContent>
                 <CardFooter>
@@ -189,18 +191,18 @@ export default function AuthPage() {
                   <div className="flex items-center space-x-2">
                     <Checkbox id="terms" required />
                     <Label htmlFor="terms" className="text-sm font-normal">
-                      I agree to the{" "}
+                      I agree to the
                       <Link href="#" className="text-primary hover:underline">
                         terms of service
-                      </Link>{" "}
-                      and{" "}
+                      </Link>
+                      and
                       <Link href="#" className="text-primary hover:underline">
                         privacy policy
                       </Link>
                     </Label>
                   </div>
                 </CardContent>
-                <CardFooter>
+                <CardFooter className="flex flex-col">
                   <Button type="submit" className="w-full" disabled={isLoading}>
                     {isLoading ? "Creating account..." : "Create account"}
                   </Button>

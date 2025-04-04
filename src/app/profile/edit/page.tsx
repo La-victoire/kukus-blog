@@ -22,39 +22,36 @@ import Link from "next/link"
 import { cn } from "@/lib/utils"
 
 // Mock user data
-const userData = {
-  firstName: "Alex",
-  lastName: "Johnson",
-  username: "alexj",
-  email: "alex.johnson@example.com",
-  phone: "+1 (555) 123-4567",
-  bio: "Senior Web Developer with 10+ years of experience in building modern web applications.",
-  occupation: "Senior Web Developer",
-  avatar: "/placeholder.svg?height=200&width=200",
-  dob: new Date("1990-05-15"),
-  gender: "male",
-  isAdmin: true,
-  address: {
-    street: "123 Main St",
-    city: "San Francisco",
-    state: "CA",
-    zipCode: "94105",
-    country: "United States",
-  },
-  socialLinks: {
-    twitter: "https://twitter.com/alexj",
-    linkedin: "https://linkedin.com/in/alexj",
-    github: "https://github.com/alexj",
-  },
-}
 
 export default function EditProfilePage() {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [profileData, setProfileData] = useState(userData)
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(userData.dob)
-  const [avatarFile, setAvatarFile] = useState<File | null>(null)
+  const [avatarFile, setAvatarFile] = useState<File | null | any>(null)
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
+  const [profileData, setProfileData] = useState({
+    firstName: "Alex",
+    lastName: "Johnson",
+    username: "alexj",
+    email: "alex.johnson@example.com",
+    phone: "+1 (555) 123-4567",
+    bio: "Senior Web Developer with 10+ years of experience in building modern web applications.",
+    occupation: "Senior Web Developer",
+    avatar: avatarFile,
+    gender: "male",
+    role: "user",
+    address: [{
+      city: "Warri",
+      state: "Delta",
+      country: "Nigeria",
+    }],
+    socialLinks: [{
+      twitter: "https://twitter.com/alexj",
+      linkedin: "https://linkedin.com/in/alexj",
+      github: "https://github.com/alexj",
+    }],
+    password: ""
+  }
+  )
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -84,6 +81,21 @@ export default function EditProfilePage() {
     })
   }
 
+  const formInfo = new FormData();
+  
+    formInfo.append( "firstname",profileData.firstName)
+    formInfo.append("lastname" ,profileData.lastName)
+    formInfo.append("username" ,profileData.username)
+    formInfo.append("email" ,profileData.email)
+    formInfo.append("phone" ,profileData.phone)
+    formInfo.append("bio" ,profileData.bio)
+    formInfo.append("profile_img" ,avatarFile)
+    formInfo.append("socials" ,JSON.stringify(profileData.socialLinks))
+    formInfo.append("address" ,JSON.stringify(profileData.address))
+    formInfo.append("gender" ,profileData.gender)
+    formInfo.append("password" ,profileData.password)
+
+
   const handleAvatarClick = () => {
     fileInputRef.current?.click()
   }
@@ -92,6 +104,7 @@ export default function EditProfilePage() {
     const file = e.target.files?.[0]
     if (file) {
       setAvatarFile(file)
+      console.log(file)
       const reader = new FileReader()
       reader.onloadend = () => {
         setAvatarPreview(reader.result as string)
@@ -103,11 +116,13 @@ export default function EditProfilePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
-
+    formInfo.forEach((value,key) => {
+      console.log(key,value)
+    })
     // Simulate API call
     setTimeout(() => {
       setIsSubmitting(false)
-      router.push("/profile")
+     // router.push("/profile")
     }, 1500)
   }
 
@@ -120,12 +135,12 @@ export default function EditProfilePage() {
         </Button>
       </Link>
 
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between px-5 md:px-2 mb-6">
         <div>
           <h1 className="text-3xl font-bold">Edit Profile</h1>
           <p className="text-muted-foreground">Update your personal information and preferences</p>
         </div>
-        <div>{profileData.isAdmin && <Badge className="bg-primary">Admin</Badge>}</div>
+        <div>{profileData.role && <Badge className="bg-primary">Admin</Badge>}</div>
       </div>
 
       <Tabs defaultValue="personal" className="w-full">
@@ -230,34 +245,6 @@ export default function EditProfilePage() {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="space-y-2">
-                    <Label>Date of Birth</Label>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className={cn(
-                            "w-full justify-start text-left font-normal",
-                            !selectedDate && "text-muted-foreground",
-                          )}
-                        >
-                          <CalendarIcon className="mr-2 h-4 w-4" />
-                          {selectedDate ? format(selectedDate, "PPP") : "Select date"}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0">
-                        <Calendar
-                          mode="single"
-                          selected={selectedDate}
-                          onSelect={setSelectedDate}
-                          initialFocus
-                          captionLayout="dropdown-buttons"
-                          fromYear={1940}
-                          toYear={2010}
-                        />
-                      </PopoverContent>
-                    </Popover>
-                  </div>
                 </div>
 
                 {/* Bio and Occupation */}
@@ -310,23 +297,13 @@ export default function EditProfilePage() {
 
                 {/* Address */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-medium">Address</h3>
-                  <div className="space-y-2">
-                    <Label htmlFor="street">Street Address</Label>
-                    <Input
-                      id="street"
-                      name="address.street"
-                      value={profileData.address.street}
-                      onChange={handleInputChange}
-                    />
-                  </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="city">City</Label>
                       <Input
                         id="city"
                         name="address.city"
-                        value={profileData.address.city}
+                        value={profileData.address.map((i)=> i.city)}
                         onChange={handleInputChange}
                       />
                     </div>
@@ -335,27 +312,18 @@ export default function EditProfilePage() {
                       <Input
                         id="state"
                         name="address.state"
-                        value={profileData.address.state}
+                        value={profileData.address.map((i)=> i.state)}
                         onChange={handleInputChange}
                       />
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="zipCode">Zip/Postal Code</Label>
-                      <Input
-                        id="zipCode"
-                        name="address.zipCode"
-                        value={profileData.address.zipCode}
-                        onChange={handleInputChange}
-                      />
-                    </div>
-                    <div className="space-y-2">
                       <Label htmlFor="country">Country</Label>
                       <Input
                         id="country"
                         name="address.country"
-                        value={profileData.address.country}
+                        value={profileData.address.map((i)=> i.country)}
                         onChange={handleInputChange}
                       />
                     </div>
@@ -370,7 +338,7 @@ export default function EditProfilePage() {
                     <Input
                       id="twitter"
                       name="socialLinks.twitter"
-                      value={profileData.socialLinks.twitter}
+                      value={profileData.socialLinks.map((i)=> i.twitter)}
                       onChange={handleInputChange}
                       placeholder="https://twitter.com/username"
                     />
@@ -380,7 +348,7 @@ export default function EditProfilePage() {
                     <Input
                       id="linkedin"
                       name="socialLinks.linkedin"
-                      value={profileData.socialLinks.linkedin}
+                      value={profileData.socialLinks.map((i)=> i.linkedin)}
                       onChange={handleInputChange}
                       placeholder="https://linkedin.com/in/username"
                     />
@@ -390,7 +358,7 @@ export default function EditProfilePage() {
                     <Input
                       id="github"
                       name="socialLinks.github"
-                      value={profileData.socialLinks.github}
+                      value={profileData.socialLinks.map((i)=> i.github)}
                       onChange={handleInputChange}
                       placeholder="https://github.com/username"
                     />
@@ -408,39 +376,6 @@ export default function EditProfilePage() {
                 <CardDescription>Manage your account preferences and role</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                {/* Admin Status */}
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label htmlFor="admin-status">Admin Status</Label>
-                    <p className="text-sm text-muted-foreground">Enable admin privileges for this account</p>
-                  </div>
-                  <Switch
-                    id="admin-status"
-                    checked={profileData.isAdmin}
-                    onCheckedChange={(checked) => handleSelectChange("isAdmin", checked.toString())}
-                  />
-                </div>
-
-                {/* Email Preferences */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-medium">Email Preferences</h3>
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label htmlFor="marketing-emails">Marketing Emails</Label>
-                      <p className="text-sm text-muted-foreground">Receive emails about new features and promotions</p>
-                    </div>
-                    <Switch id="marketing-emails" defaultChecked />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label htmlFor="comment-notifications">Comment Notifications</Label>
-                      <p className="text-sm text-muted-foreground">
-                        Receive notifications when someone comments on your posts
-                      </p>
-                    </div>
-                    <Switch id="comment-notifications" defaultChecked />
-                  </div>
-                </div>
 
                 {/* Account Security */}
                 <div className="space-y-4">
@@ -448,9 +383,6 @@ export default function EditProfilePage() {
                   <div className="space-y-2">
                     <Button variant="outline" type="button" className="w-full">
                       Change Password
-                    </Button>
-                    <Button variant="outline" type="button" className="w-full">
-                      Enable Two-Factor Authentication
                     </Button>
                   </div>
                 </div>
