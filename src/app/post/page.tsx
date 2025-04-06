@@ -291,7 +291,7 @@ export default function BlogPage() {
                   <div className="flex items-center justify-between mt-auto">
                     <div className="flex items-center gap-2">
                       <Avatar className="h-8 w-8">
-                        <AvatarImage src={post?.user?.profile_img} alt={post?.user?.name || post?.user?.firstname} />
+                        <AvatarImage src={post?.user?.profile_img.map((i)=> i.value).join("")} alt={post?.user?.name || post?.user?.firstname} />
                         <AvatarFallback>{post?.user?.name?.charAt(0)}</AvatarFallback>
                       </Avatar>
                       <span className="text-sm font-medium">{post?.user?.name || post?.user?.firstname}</span>

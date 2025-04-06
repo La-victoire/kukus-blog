@@ -146,7 +146,7 @@ const DataComponent = () => {
                   </Badge>
                 </Link>
               ))}
-              <Link href="/categories">
+              <Link href="/post">
                 <Badge variant="outline" className="hover:bg-primary/10 transition-colors">
                   More...
                 </Badge>

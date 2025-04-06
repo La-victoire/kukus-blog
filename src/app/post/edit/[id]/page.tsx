@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -16,7 +16,7 @@ import { ArrowLeft, X, Loader2, ImageIcon } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { DeletePostDialog } from "@/app/components/blog/delete-blog-dialog"
-import { getData } from "@/utils/api"
+import { getData, putData } from "@/utils/api"
 import useSWR from "swr"
 
 // Sample post data
@@ -77,30 +77,49 @@ export default function EditPostPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const { data:postData, error:postError, isLoading:postLoading } = useSWR(id,fetcher);
-  const [tags, setTags] = useState<string[]>(postData?.tags)
+  const [tags, setTags] = useState<string[]>([])
   const [newTag, setNewTag] = useState("")
-  const [prevImage, setPrevImage] = useState<string | null>(postData?.coverImage.map((img:any)=> img.value).join(""))
+  const [prevImage, setPrevImage] = useState<string | null>()
   const [coverImageFile, setCoverImageFile] = useState<File | null>(null)
   const [coverImagePreview, setCoverImagePreview] = useState<string | null>(null)
+  const [upload, setUpload] = useState();
+
+  useEffect(() => {
+    if (postData) {
+      setUpload(postData)
+      setPrevImage(postData?.coverImage?.map((img:any)=> img.value).join(""))
+      setTags(postData?.tag)
+    }
   
-  console.log(postData)
+ 
+  }, [postData])
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
-    setPostData({
-      ...postData,
+    setUpload({
+      ...upload,
       [name]: value,
     })
   }
 
+  const handleContent = (e:React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target
+    setUpload({
+      ...upload,
+      [name]: [{value}]
+    })
+  }
+
   const handleSelectChange = (name: string, value: string) => {
-    setPostData({
-      ...postData,
+    
+    setUpload({
+      ...upload,
       [name]: value,
     })
   }
 
   const handleSwitchChange = (name: string, checked: boolean) => {
-    setPostData({
+    setUpload({
       ...postData,
       [name]: checked,
     })
@@ -109,7 +128,7 @@ export default function EditPostPage() {
   const handleAddTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && newTag.trim()) {
       e.preventDefault()
-      if (!tags.includes(newTag.trim())) {
+      if (!tags?.includes(newTag.trim())) {
         setTags([...tags, newTag.trim()])
       }
       setNewTag("")
@@ -133,13 +152,13 @@ export default function EditPostPage() {
   }
   const formInfo = new FormData();
   
-  formInfo.append( "title",postData?.title )
-  formInfo.append("description" ,postData?.excerpt)
-  formInfo.append("categories" ,postData?.category)
-  formInfo.append("tags" ,JSON.stringify(newTag))
-  formInfo.append("coverImage" ,coverImageFile || postData?.coverImage || " ")
-  formInfo.append("content" ,postData?.content)
-  formInfo.append("updatedAt" ,postData?.publishedAt)
+  formInfo.append( "title",upload?.title )
+  formInfo.append("description" ,upload?.description)
+  formInfo.append("categories" ,upload?.categories)
+  formInfo.append("tags" ,JSON.stringify(tags))
+  formInfo.append("coverImage" ,coverImageFile || prevImage || " ")
+  formInfo.append("content" ,upload?.content)
+  formInfo.append("updatedAt" ,upload?.updatedAt)
 
 
 
@@ -147,20 +166,26 @@ export default function EditPostPage() {
     e.preventDefault()
     setIsSubmitting(true)
 
-    const updatedPostData = {
-      ...postData,
-      tags,
-      status: action === "publish" ? "published" : action === "draft" ? "draft" : postData.status,
-    }
     formInfo.forEach((key, value)=> 
       console.log(key,":", value)
     )
-    
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false)
-      // router.push(`/post/${params.id}`)
-    }, 1500)
+    try {
+      const data = putData(`/edit/${id}`,formInfo);
+      if (!data) {
+        const error = new Error("Something went wrong!!!")
+        setIsSubmitting(false)
+        throw error
+      } else {
+        // Simulate API call
+        setTimeout(() => {
+          setIsSubmitting(false)
+           router.push(`/post/${id}`)
+        }, 1500)
+      }
+      
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   const handleDelete = () => {
@@ -176,6 +201,8 @@ export default function EditPostPage() {
       router.push("/blog")
     }, 1500)
   }
+
+  if (postLoading) return (<div> Loading...</div>)
 
   return (
     <div className="container max-w-4xl py-12">
@@ -261,13 +288,13 @@ export default function EditPostPage() {
               {/* Title */}
               <div className="space-y-2">
                 <Label htmlFor="title">Title</Label>
-                <Input id="title" name="title" value={postData?.title} onChange={handleInputChange} required />
+                <Input id="title" name="title" value={upload?.title} onChange={handleInputChange} required />
               </div>
 
               {/* Excerpt */}
               <div className="space-y-2">
                 <Label htmlFor="description">Description</Label>
-                <Textarea id="description" name="description" value={postData?.description} onChange={handleInputChange} rows={2} />
+                <Textarea id="description" name="description" value={upload?.description} onChange={handleInputChange} rows={2} />
                 <p className="text-xs text-muted-foreground">
                   A brief summary of your post. This will be displayed in post previews.
                 </p>
@@ -279,8 +306,8 @@ export default function EditPostPage() {
                 <Textarea
                   id="content"
                   name="content"
-                  value={postData?.content.map((img:any, index:number)=> {if(index === 0) return img.value})}
-                  onChange={handleInputChange}
+                  value={upload?.content?.map((img:any, index:number)=> {if(index === 0) return img.value}).join("")}
+                  onChange={handleContent}
                   rows={15}
                   className="font-mono"
                 />
@@ -293,7 +320,7 @@ export default function EditPostPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <Label htmlFor="category">Category</Label>
-                  <Select value={postData?.categories} onValueChange={(value) => handleSelectChange("category", value)}>
+                  <Select value={upload?.categories} onValueChange={(value) => handleSelectChange("category", value)}>
                     <SelectTrigger id="category">
                       <SelectValue placeholder="Select category" />
                     </SelectTrigger>
@@ -310,10 +337,12 @@ export default function EditPostPage() {
                   <Label htmlFor="tags">Tags</Label>
                   <div className="flex flex-wrap gap-2 mb-2">
                     {tags?.map((tag) => (
+                      <div key={tag} className="flex flex-row justify-center items-center">
                       <Badge key={tag} variant="secondary" className="flex items-center gap-1">
                         {tag}
-                        <X className="h-3 w-3 cursor-pointer" onClick={() => handleRemoveTag(tag)} />
                       </Badge>
+                        <X className="h-3 w-3 cursor-pointer" onClick={() => handleRemoveTag(tag)} />
+                      </div>
                     ))}
                   </div>
                   <Input

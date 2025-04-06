@@ -93,7 +93,7 @@ export default function BlogPost() {
           {/* Author info */}
           <div className="flex items-center gap-4 mb-8 pb-8 border-b">
             <Avatar className="h-12 w-12">
-              <AvatarImage src={posts?.user?.profile_img} alt={"author image"} />
+              <AvatarImage src={posts?.user?.profile_img?.map((i)=> i.value).join("")} alt={"author image"} />
               <AvatarFallback>{posts?.user?.name?.charAt(0)}</AvatarFallback>
             </Avatar>
             <div>
