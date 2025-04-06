@@ -59,7 +59,7 @@ export const putData = async <T>(endpoint: string, data: any): Promise<T> => {
 export const deleteData = async <T>(endpoint: string): Promise<T> => {
   try {
     const response = await postsApi.delete<ApiResponse<T>>(endpoint);
-    return response.data.data;
+    return response.data.message;
   } catch (error) {
     handleError(error);
   }

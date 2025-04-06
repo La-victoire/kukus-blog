@@ -15,7 +15,8 @@ import Link from "next/link"
 import useSWR from "swr"
 import { getUser, postAdminSession } from "@/utils/userApi"
 import { useParams } from "next/navigation"
-import { getData } from "@/utils/api"
+import { deleteData, getData } from "@/utils/api"
+import { DeletePostDialog } from "@/app/components/blog/delete-blog-dialog"
 
 // Mock user data
 const user = {
@@ -60,6 +61,8 @@ export default function ProfilePage () {
   const { data:users, error:userError, isLoading:userLoading } = useSWR(id,fetcher);
   const { data:posts, error:postError, isLoading:postsLoading } = useSWR("/view", dataFetcher);
   const [isEditing, setIsEditing] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)  
   const [profileData, setProfileData] = useState({
     name: user.name,
     email: user.email,
@@ -73,6 +76,33 @@ export default function ProfilePage () {
     // In a real app, you would send this data to your backend
     setIsEditing(false)
   }
+  const handleDelete = () => {
+    setIsDeleteDialogOpen(true)
+  }
+  const confirmDelete =  async (id:any) => {
+    setIsSubmitting(true)
+    try {
+      console.log(id);
+      
+      const data = await deleteData(id)
+      if (!data) {
+        setIsSubmitting(false)
+        const error = new Error("Something Went Wrong")
+        throw error
+      } else {
+        // Simulate API call
+        setTimeout(() => {
+          console.log(data)
+          setIsSubmitting(false)
+          location.reload()
+        }, 1500)
+
+      }
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
   const properDate = (date:any) => {
     return new Date(date).toLocaleDateString("en-US", { month: "short",
       day:"2-digit",
@@ -92,17 +122,9 @@ export default function ProfilePage () {
               <div className="flex flex-col items-center text-center">
                 <div className="relative">
                   <Avatar className="h-24 w-24">
-                    <AvatarImage src={users?.profile_img} alt="Author Img"/>
+                    <AvatarImage src={users?.profile_img?.map((i)=> i.value).join("")} alt="Author Img"/>
                     <AvatarFallback>{users?.firstname?.charAt(0) || users?.name?.charAt(0)}</AvatarFallback>
                   </Avatar>
-                  <Button
-                    size="icon"
-                    variant="outline"
-                    className="absolute bottom-0 right-0 rounded-full h-8 w-8"
-                    onClick={() => setIsEditing(true)}
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
                 </div>
                 <h2 className="mt-4 text-xl font-bold">{users?.firstname || users?.name }</h2>
                 <p className="text-sm text-muted-foreground">Member since {properDate(users?.createdAt)}</p>
@@ -146,13 +168,13 @@ export default function ProfilePage () {
                       <div className="flex flex-col md:flex-row">
                         <div className="relative h-48 md:h-auto md:w-48 shrink-0">
                           <img
-                            src={post.coverImage || "/project_pics/abstract-5719221.jpg"}
+                            src={post?.coverImage?.map((i)=> i.value).join("") || "/project_pics/abstract-5719221.jpg"}
                             alt={post.title}
                             className="h-full w-full object-cover"
                           />
                         </div>
                         <CardContent className="flex-1 p-6">
-                          <Link href={`/blog/${post.id}`}>
+                          <Link href={`/blog/${post._id}`}>
                             <h3 className="text-xl font-bold hover:text-primary">{post.title}</h3>
                           </Link>
                           <p className="text-sm text-muted-foreground mt-1">{post.publishedAt}</p>
@@ -163,10 +185,17 @@ export default function ProfilePage () {
                                 Edit
                               </Button>
                             </Link>
-                            <Button variant="outline" size="sm" className="text-destructive">
-                              Delete
+                            <Button variant="destructive" className="active:cursor-pointer" onClick={()=>handleDelete}>
+                              Delete {post.title}
                             </Button>
                           </div>
+                          <DeletePostDialog
+                            open={isDeleteDialogOpen}
+                            onOpenChange={setIsDeleteDialogOpen}
+                            onConfirm={()=> confirmDelete(post._id)}
+                            isDeleting={isSubmitting}
+                            postTitle={post.title}
+                          />
                         </CardContent>
                       </div>
                     </Card>
