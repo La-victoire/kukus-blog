@@ -185,7 +185,7 @@ export default function ProfilePage () {
                                 Edit
                               </Button>
                             </Link>
-                            <Button variant="destructive" className="active:cursor-pointer" onClick={()=>handleDelete}>
+                            <Button variant="destructive" className="active:cursor-pointer" onClick={()=>(handleDelete)}>
                               Delete {post.title}
                             </Button>
                           </div>
@@ -270,7 +270,9 @@ export default function ProfilePage () {
                         <div className="font-medium">Bio:</div>
                         <div>{users?.bio || ""}</div>
                       </div>
-                      <Button onClick={() => setIsEditing(true)}>Edit Profile</Button>
+                      <Link href="edit">
+                      <Button>Edit Profile</Button>
+                      </Link>
                     </div>
                   )}
                 </CardContent>

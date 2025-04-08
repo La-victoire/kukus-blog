@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -20,6 +20,8 @@ import { format } from "date-fns"
 import { CalendarIcon, Loader2, Upload, ArrowLeft, Camera } from "lucide-react"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
+import { editProfile } from "@/utils/api"
+import { getUser } from "@/utils/userApi"
 
 // Mock user data
 
@@ -28,32 +30,43 @@ export default function EditProfilePage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [avatarFile, setAvatarFile] = useState<File | null | any>(null)
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
+  const [profile, setProfile] = useState()
+  const [userId, setUserId] = useState<Promise<T>>();
+  useEffect(()=> {
+    const sessionInfo = sessionStorage.getItem("user")
+    setUserId(sessionInfo ? JSON.parse(sessionInfo) : null)
+
+    const getInfo = async () => {
+      const data = await getUser(userId?.id)
+      console.log(data)
+      if (data) {
+        setProfile(data)
+      } else {
+        console.error("No Data")
+      }
+
+    }
+    
+    getInfo();
+  },[])
   const [profileData, setProfileData] = useState({
-    firstName: "Alex",
-    lastName: "Johnson",
-    username: "alexj",
-    email: "alex.johnson@example.com",
-    phone: "+1 (555) 123-4567",
-    bio: "Senior Web Developer with 10+ years of experience in building modern web applications.",
-    occupation: "Senior Web Developer",
-    avatar: avatarFile,
-    gender: "male",
-    role: "user",
-    address: [{
-      city: "Warri",
-      state: "Delta",
-      country: "Nigeria",
-    }],
-    socialLinks: [{
-      twitter: "https://twitter.com/alexj",
-      linkedin: "https://linkedin.com/in/alexj",
-      github: "https://github.com/alexj",
-    }],
+    firstName: profile?.firstname || profile?.name,
+    lastName: profile?.lastname,
+    username: profile?.username,
+    email: profile?.email,
+    phone: profile?.phone,
+    bio: profile?.bio,
+    occupation: profile?.occupation,
+    avatar: profile?.profile_img,
+    gender: profile?.gender,
+    role: profile?.role,
+    address: profile?.address,
+    socialLinks: profile?.socials,
     password: ""
   }
   )
-  const fileInputRef = useRef<HTMLInputElement>(null)
 
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
 
@@ -89,7 +102,7 @@ export default function EditProfilePage() {
     formInfo.append("email" ,profileData.email)
     formInfo.append("phone" ,profileData.phone)
     formInfo.append("bio" ,profileData.bio)
-    formInfo.append("profile_img" ,avatarFile)
+    formInfo.append("profile_img" , profileData.avatar)
     formInfo.append("socials" ,JSON.stringify(profileData.socialLinks))
     formInfo.append("address" ,JSON.stringify(profileData.address))
     formInfo.append("gender" ,profileData.gender)
@@ -119,6 +132,7 @@ export default function EditProfilePage() {
     formInfo.forEach((value,key) => {
       console.log(key,value)
     })
+    const data = editProfile()
     // Simulate API call
     setTimeout(() => {
       setIsSubmitting(false)
@@ -163,8 +177,8 @@ export default function EditProfilePage() {
                 <div className="flex flex-col items-center sm:flex-row sm:items-start gap-6">
                   <div className="relative">
                     <Avatar className="h-24 w-24 cursor-pointer" onClick={handleAvatarClick}>
-                      <AvatarImage src={avatarPreview || profileData.avatar} alt={profileData.firstName} />
-                      <AvatarFallback>{profileData.firstName.charAt(0)}</AvatarFallback>
+                      <AvatarImage src={avatarPreview || profile.profile_img.map((i)=> i.value).join("")} alt={profileData.firstName} />
+                      <AvatarFallback>{profile?.firstName?.charAt(0)}</AvatarFallback>
                     </Avatar>
                     <div
                       className="absolute bottom-0 right-0 bg-primary text-white rounded-full p-1 cursor-pointer"
@@ -199,7 +213,7 @@ export default function EditProfilePage() {
                     <Input
                       id="firstName"
                       name="firstName"
-                      value={profileData.firstName}
+                      value={profileData?.firstName}
                       onChange={handleInputChange}
                       required
                     />

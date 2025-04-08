@@ -67,7 +67,7 @@ console.log(posts?.map((post)=>post?.user?.name || post?.user?.firstname))
                   <CardContent className="p-6 bg-white dark:bg-gray-950">
                         <div className="flex items-center justify-between -mt-8">
                           <Avatar>
-                            <AvatarImage src={post?.user?.profile_img} alt={post?.user?.name} />
+                            <AvatarImage src={post?.user?.profile_img?.map((i)=> i.value)} alt={post?.user?.name} />
                             <AvatarFallback>{post?.user?.name?.charAt(0)}</AvatarFallback>
                           </Avatar>
                           <span className="text-muted-foreground">{post?.user?.username || post?.user?.name || post?.user?.firstname }</span>
