@@ -31,40 +31,63 @@ export default function EditProfilePage() {
   const [avatarFile, setAvatarFile] = useState<File | null | any>(null)
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
   const [profile, setProfile] = useState()
-  const [userId, setUserId] = useState<Promise<T>>();
-  useEffect(()=> {
-    const sessionInfo = sessionStorage.getItem("user")
-    setUserId(sessionInfo ? JSON.parse(sessionInfo) : null)
-
-    const getInfo = async () => {
-      const data = await getUser(userId?.id)
-      console.log(data)
-      if (data) {
-        setProfile(data)
-      } else {
-        console.error("No Data")
-      }
-
-    }
-    
-    getInfo();
-  },[])
   const [profileData, setProfileData] = useState({
-    firstName: profile?.firstname || profile?.name,
-    lastName: profile?.lastname,
-    username: profile?.username,
-    email: profile?.email,
-    phone: profile?.phone,
-    bio: profile?.bio,
-    occupation: profile?.occupation,
-    avatar: profile?.profile_img,
-    gender: profile?.gender,
-    role: profile?.role,
-    address: profile?.address,
-    socialLinks: profile?.socials,
+    firstName: "",
+    lastName: "",
+    username: "",
+    email: "",
+    phone: "",
+    bio: "",
+    occupation: "",
+    avatar: "",
+    gender: "",
+    role: "",
+    address: [],
+    socialLinks: "",
     password: ""
   }
   )
+  const [userId, setUserId] = useState();
+  useEffect(()=> {
+    const getSession = () => {
+      const session = sessionStorage.getItem("user")
+      setUserId(session ? JSON.parse(session) : null)
+    }
+    
+    getSession()
+    
+    
+  },[])
+  
+  useEffect(()=> {
+    console.log(userId)
+    if (userId) {
+    const getInfo = async () => {
+        const data = await getUser(userId?.id)
+        console.log(data)
+        data ? setProfile(data) : console.error("No Data")  
+        setProfileData({
+          firstName: data?.firstName || data?.name || "",
+          lastName: data?.lastName || "",
+          username: data?.username || "",
+          email: data?.email || "",
+          phone: data?.phone || "",
+          bio: data?.bio || "",
+          occupation: data?.occupation || "",
+          profile_img: data?.profile_img || "",
+          gender: data?.gender || "",
+          role: data?.role || "",
+          address: Array.isArray(data.address) ? data.address : [],
+          socials: Array.isArray(data.socials) ? data.socials : [],
+      })
+    }
+      getInfo();
+    } else {
+      console.error("No USER Detected")
+    }
+
+  },[userId])
+
 
   const fileInputRef = useRef<HTMLInputElement>(null)
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -96,17 +119,17 @@ export default function EditProfilePage() {
 
   const formInfo = new FormData();
   
-    formInfo.append( "firstname",profileData.firstName)
-    formInfo.append("lastname" ,profileData.lastName)
-    formInfo.append("username" ,profileData.username)
-    formInfo.append("email" ,profileData.email)
-    formInfo.append("phone" ,profileData.phone)
-    formInfo.append("bio" ,profileData.bio)
-    formInfo.append("profile_img" , profileData.avatar)
-    formInfo.append("socials" ,JSON.stringify(profileData.socialLinks))
-    formInfo.append("address" ,JSON.stringify(profileData.address))
-    formInfo.append("gender" ,profileData.gender)
-    formInfo.append("password" ,profileData.password)
+    formInfo.append( "firstname",profileData?.firstName || profileData?.name)
+    formInfo.append("lastname" ,profileData?.lastName || profileData?.lastname)
+    formInfo.append("username" ,profileData?.username || profileData?.username)
+    formInfo.append("email" ,profileData?.email || profileData?.email)
+    formInfo.append("phone" ,profileData?.phone || profileData?.phone)
+    formInfo.append("bio" ,profileData?.bio || profileData?.bio)
+    formInfo.append("profile_img" , avatarFile || profileData?.profile_img?.map((i)=> i.value) )
+    formInfo.append("socials" ,JSON.stringify(profileData?.socials))
+    formInfo.append("address" ,JSON.stringify(profileData?.address))
+    formInfo.append("gender" , profileData?.gender)
+    // formInfo.append("password" ,profileData?.password)
 
 
   const handleAvatarClick = () => {
@@ -123,6 +146,7 @@ export default function EditProfilePage() {
         setAvatarPreview(reader.result as string)
       }
       reader.readAsDataURL(file)
+      console.log(avatarPreview)
     }
   }
 
@@ -132,7 +156,8 @@ export default function EditProfilePage() {
     formInfo.forEach((value,key) => {
       console.log(key,value)
     })
-    const data = editProfile()
+    console.log("address :",profileData?.address, "socials", profileData?.socialLinks, "data", profileData)
+    // const data = editProfile()
     // Simulate API call
     setTimeout(() => {
       setIsSubmitting(false)
@@ -141,22 +166,23 @@ export default function EditProfilePage() {
   }
 
   return (
-    <div className="container max-w-4xl py-12">
-      <Link href="/profile">
-        <Button variant="ghost" size="sm" className="mb-6">
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to profile
-        </Button>
-      </Link>
+  <div className="py-12 flex items-center justify-center">
 
-      <div className="flex items-center justify-between px-5 md:px-2 mb-6">
-        <div>
-          <h1 className="text-3xl font-bold">Edit Profile</h1>
-          <p className="text-muted-foreground">Update your personal information and preferences</p>
-        </div>
-        <div>{profileData.role && <Badge className="bg-primary">Admin</Badge>}</div>
+    <div className="container max-w-4xl">
+    <Link href={`/profile/${userId?.id}`}>
+      <Button variant="ghost" size="sm" className="mb-6 lg:-ml-40">
+        <ArrowLeft className="w-4 h-4 mr-2" />
+        Back to profile
+      </Button>
+    </Link>
+
+    <div className="flex items-center justify-between px-5 md:px-2 mb-6">
+      <div>
+        <h1 className="text-3xl font-bold">Edit Profile</h1>
+        <p className="text-muted-foreground">Update your personal information and preferences</p>
       </div>
-
+      <div>{profileData?.role && <Badge className="bg-primary">Admin</Badge>}</div>
+    </div>
       <Tabs defaultValue="personal" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="personal">Personal Info</TabsTrigger>
@@ -176,10 +202,17 @@ export default function EditProfilePage() {
                 {/* Profile Picture */}
                 <div className="flex flex-col items-center sm:flex-row sm:items-start gap-6">
                   <div className="relative">
+                    {Array.isArray(profileData?.profile_img) && !avatarFile ? (
                     <Avatar className="h-24 w-24 cursor-pointer" onClick={handleAvatarClick}>
-                      <AvatarImage src={avatarPreview || profile.profile_img.map((i)=> i.value).join("")} alt={profileData.firstName} />
-                      <AvatarFallback>{profile?.firstName?.charAt(0)}</AvatarFallback>
+                      <AvatarImage src={profileData?.profile_img.map((i)=> i.value).join("") }  alt={profileData?.firstName} />
+                      <AvatarFallback>{profileData?.firstName?.charAt(0)}</AvatarFallback>
                     </Avatar>
+                    ): (
+                    <Avatar className="h-24 w-24 cursor-pointer" onClick={handleAvatarClick}>
+                      <AvatarImage src={avatarPreview}  alt={profileData?.firstName} />
+                      <AvatarFallback>{profileData?.firstName?.charAt(0)}</AvatarFallback>
+                    </Avatar> 
+                    )}
                     <div
                       className="absolute bottom-0 right-0 bg-primary text-white rounded-full p-1 cursor-pointer"
                       onClick={handleAvatarClick}
@@ -213,7 +246,7 @@ export default function EditProfilePage() {
                     <Input
                       id="firstName"
                       name="firstName"
-                      value={profileData?.firstName}
+                      value={profileData?.firstName || profileData?.name}
                       onChange={handleInputChange}
                       required
                     />
@@ -223,7 +256,7 @@ export default function EditProfilePage() {
                     <Input
                       id="lastName"
                       name="lastName"
-                      value={profileData.lastName}
+                      value={profileData?.lastName}
                       onChange={handleInputChange}
                       required
                     />
@@ -236,7 +269,7 @@ export default function EditProfilePage() {
                   <Input
                     id="username"
                     name="username"
-                    value={profileData.username}
+                    value={profileData?.username}
                     onChange={handleInputChange}
                     required
                   />
@@ -247,15 +280,13 @@ export default function EditProfilePage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="gender">Gender</Label>
-                    <Select value={profileData.gender} onValueChange={(value) => handleSelectChange("gender", value)}>
+                    <Select value={profileData?.gender} onValueChange={(value) => handleSelectChange("gender", value)}>
                       <SelectTrigger id="gender">
                         <SelectValue placeholder="Select gender" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="male">Male</SelectItem>
                         <SelectItem value="female">Female</SelectItem>
-                        <SelectItem value="non-binary">Non-binary</SelectItem>
-                        <SelectItem value="prefer-not-to-say">Prefer not to say</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -267,13 +298,13 @@ export default function EditProfilePage() {
                   <Input
                     id="occupation"
                     name="occupation"
-                    value={profileData.occupation}
+                    value={profileData?.occupation}
                     onChange={handleInputChange}
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="bio">Bio</Label>
-                  <Textarea id="bio" name="bio" value={profileData.bio} onChange={handleInputChange} rows={4} />
+                  <Textarea id="bio" name="bio" value={profileData?.bio} onChange={handleInputChange} rows={4} />
                   <p className="text-xs text-muted-foreground">
                     Write a short bio about yourself. This will be displayed on your public profile.
                   </p>
@@ -298,14 +329,14 @@ export default function EditProfilePage() {
                       id="email"
                       name="email"
                       type="email"
-                      value={profileData.email}
+                      value={profileData?.email}
                       onChange={handleInputChange}
                       required
                     />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="phone">Phone Number</Label>
-                    <Input id="phone" name="phone" value={profileData.phone} onChange={handleInputChange} />
+                    <Input id="phone" name="phone" value={profileData?.phone} onChange={handleInputChange} />
                   </div>
                 </div>
 
@@ -317,7 +348,7 @@ export default function EditProfilePage() {
                       <Input
                         id="city"
                         name="address.city"
-                        value={profileData.address.map((i)=> i.city)}
+                        value={profileData?.address?.map((i)=> i.city)}
                         onChange={handleInputChange}
                       />
                     </div>
@@ -326,7 +357,7 @@ export default function EditProfilePage() {
                       <Input
                         id="state"
                         name="address.state"
-                        value={profileData.address.map((i)=> i.state)}
+                        value={profileData?.address?.map((i)=> i.state)}
                         onChange={handleInputChange}
                       />
                     </div>
@@ -337,7 +368,7 @@ export default function EditProfilePage() {
                       <Input
                         id="country"
                         name="address.country"
-                        value={profileData.address.map((i)=> i.country)}
+                        value={profileData?.address?.map((i)=> i.country)}
                         onChange={handleInputChange}
                       />
                     </div>
@@ -352,7 +383,7 @@ export default function EditProfilePage() {
                     <Input
                       id="twitter"
                       name="socialLinks.twitter"
-                      value={profileData.socialLinks.map((i)=> i.twitter)}
+                      value={profileData?.socials?.map((i)=> i.twitter)}
                       onChange={handleInputChange}
                       placeholder="https://twitter.com/username"
                     />
@@ -362,7 +393,7 @@ export default function EditProfilePage() {
                     <Input
                       id="linkedin"
                       name="socialLinks.linkedin"
-                      value={profileData.socialLinks.map((i)=> i.linkedin)}
+                      value={profileData?.socials?.map((i)=> i.linkedin)}
                       onChange={handleInputChange}
                       placeholder="https://linkedin.com/in/username"
                     />
@@ -372,7 +403,7 @@ export default function EditProfilePage() {
                     <Input
                       id="github"
                       name="socialLinks.github"
-                      value={profileData.socialLinks.map((i)=> i.github)}
+                      value={profileData?.socials?.map((i)=> i.github)}
                       onChange={handleInputChange}
                       placeholder="https://github.com/username"
                     />
@@ -433,6 +464,8 @@ export default function EditProfilePage() {
         </form>
       </Tabs>
     </div>
+  </div>
+
   )
 }
 
