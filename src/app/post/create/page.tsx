@@ -12,7 +12,20 @@ import { useRouter } from "next/navigation"
 import { ArrowLeft, ImageIcon, Loader2 } from "lucide-react"
 import Link from "next/link"
 import { postData } from "@/utils/api"
-import { title } from "process"
+import { Toaster } from "sonner"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { TextEditor } from "@/app/components/editor/Text-editor"
+import { EditorPreview } from "@/app/components/editor/editor-preview"
+
+const initialContent = `
+<h1>Welcome to KuKu's Modern Text Editor</h1>
+<ul>
+  <li>Text formatting (bold, italic, underline)</li>
+  <li>Headings and alignment</li>
+  <li>Lists (ordered and unordered)</li>
+  <li>Links and images</li>
+  <li>And more!</li>
+</ul>`
 
 export default function CreateBlogPage() {
   const router = useRouter()
@@ -23,9 +36,10 @@ export default function CreateBlogPage() {
     title: "",
     description:"",
     categories:"",
-    content: "",
+    content: initialContent,
     coverImage: coverImg 
   })
+
   const formInfo = new FormData();
 
   formInfo.append( "title",formData.title)
@@ -34,6 +48,11 @@ export default function CreateBlogPage() {
   formInfo.append( "content",formData.content)
   formInfo.append( "coverImage",formData.coverImage)
 
+
+  const handleRawFiles = (file:File) => {
+    setFormData({...formData, content:file})
+    console.log("GOT THEM FILES:", formData?.content)
+  }
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
@@ -150,9 +169,70 @@ export default function CreateBlogPage() {
                 onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                 required
               />
-              <p className="text-xs text-muted-foreground">
-                Tip: You can use Markdown formatting for headings, lists, and more.
-              </p>
+              <div className="container py-12 max-w-4xl">
+                <Toaster />
+                <h1 className="text-3xl font-bold mb-2">Modern Text Editor</h1>
+                <p className="text-muted-foreground mb-8">A rich text editor with image upload capabilities</p>
+
+                <Tabs defaultValue="edit">
+                  <TabsList className="mb-4">
+                    <TabsTrigger value="edit">Edit</TabsTrigger>
+                    <TabsTrigger value="preview">Preview</TabsTrigger>
+                    <TabsTrigger value="both">Split View</TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="edit">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Editor</CardTitle>
+                        <CardDescription>Use the toolbar to format text and add media</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <TextEditor onRawFilesChange={handleRawFiles} initialValue={formData.content} onChange={(content)=> setFormData({...formData, content:content})} minHeight="400px" />
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+
+                  <TabsContent value="preview">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Preview</CardTitle>
+                        <CardDescription>See how your content will appear</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="border rounded-md p-6 min-h-[400px]">
+                          <EditorPreview content={formData.content} />
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+
+                  <TabsContent value="both">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <Card>
+                        <CardHeader>
+                          <CardTitle>Editor</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <TextEditor onRawFilesChange={handleRawFiles} initialValue={formData.content} onChange={(content)=> setFormData({...formData, content:content})} minHeight="500px" />
+                        </CardContent>
+                      </Card>
+
+                      <Card>
+                        <CardHeader>
+                          <CardTitle>Preview</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="border rounded-md p-6 min-h-[500px] overflow-auto">
+                            <EditorPreview content={formData.content} />
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  </TabsContent>
+                </Tabs>
+
+              </div>
             </div>
           </CardContent>
           <CardFooter className="flex justify-between">

@@ -5,6 +5,7 @@ import Link from "next/link"
 import { ArrowRight, Menu, Search, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -40,10 +41,14 @@ const Navbar = () => {
         </div>
         <div>
           {user ? (
-            <Link href={`/profile/${user.id}`}>
+            <Link href={`/profile/${user.id}`} className="flex flex-row gap-5 justify-center items-center ">
             <p>
               Welcome {user.name}
             </p>
+            <Avatar className='hidden md:flex'>
+              <AvatarImage src={user?.image?.map((i)=> i.value)} alt={user?.name} />
+              <AvatarFallback>{user?.name?.charAt(0)}</AvatarFallback>
+            </Avatar>
             </Link>
           ) : (
         <Link href="/profile/sign-in">
@@ -115,14 +120,18 @@ const Navbar = () => {
                 </nav>
                 <div className="flex flex-col space-y-4">
                   <div className="flex space-x-4">
-                    <Link href="/auth" className="flex-1">
+                    {user? (
+                    <Link href="/post/create" className="flex-1">
+                      <Button className="w-full">Get Started</Button>
+                    </Link>
+                    ) : (
+                    <Link href="/sign-in" className="flex-1">
                       <Button variant="outline" className="w-full border-white text-black hover:bg-transparent hover:text-white">
                         Sign In
                       </Button>
                     </Link>
-                    <Link href="/profile?tab=signup" className="flex-1">
-                      <Button className="w-full">Get Started</Button>
-                    </Link>
+                    )
+                    }
                   </div>
                 </div>
               </div>
@@ -139,7 +148,7 @@ const Navbar = () => {
                 Explore thought-provoking articles on topics that matter. Join our community of curious minds.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link href={`#blogs`}>
+                <Link href={`/post`}>
                   <Button size="lg" className="w-full sm:w-auto">
                     Explore Articles
                     <ArrowRight className="ml-2 h-4 w-4" />

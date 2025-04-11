@@ -31,11 +31,10 @@ export const BlogCard = ({posts} : blogCardPost) => {
       year:"numeric"
     });
   };
-console.log(posts._id)
-console.log(posts?.map((post)=>post?.user?.name || post?.user?.firstname))
+
   return (
     <>
-        {Array.isArray(posts) && ( posts?.map((post:posts, index:any) => (
+        {Array.isArray(posts) && ( posts?.reverse().slice(0, 7).map((post:posts, index:any) => (
               <Card 
                   key={post._id} 
                   className={cn(
@@ -65,13 +64,6 @@ console.log(posts?.map((post)=>post?.user?.name || post?.user?.firstname))
                     </div>
                   </div>
                   <CardContent className="p-6 bg-white dark:bg-gray-950">
-                        <div className="flex items-center justify-between -mt-8">
-                          <Avatar>
-                            <AvatarImage src={post?.user?.profile_img?.map((i)=> i.value)} alt={post?.user?.name} />
-                            <AvatarFallback>{post?.user?.name?.charAt(0)}</AvatarFallback>
-                          </Avatar>
-                          <span className="text-muted-foreground">{post?.user?.username || post?.user?.name || post?.user?.firstname }</span>
-                        </div>
                     <div className="flex items-center justify-between mb-3 text-sm text-muted-foreground">
                       <span>{properDate(post.createdAt)}</span>
                       <span>10 mins</span>

@@ -35,7 +35,7 @@ const Hero = () => {
                 Handpicked articles that showcase the depth and diversity of our writers' perspectives.
               </p>
             </div>
-            <Link href="/blog" className="mt-4 md:mt-0 group flex items-center text-primary font-medium">
+            <Link href="/post" className="mt-4 md:mt-0 group flex items-center text-primary font-medium">
               View all articles
               <ChevronRight className="ml-1 h-4 w-4 group-hover:translate-x-1 transition-transform" />
             </Link>

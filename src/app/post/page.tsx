@@ -158,7 +158,12 @@ const categories = [
   "Fashion",
 ]
 
-
+const properDate = (date:any) => {
+  return new Date(date).toLocaleDateString("en-US", { month: "short",
+    day:"2-digit",
+    year:"numeric"
+  });
+};
 
 
 export default function BlogPage() {
@@ -281,7 +286,7 @@ export default function BlogPage() {
                   <div className="flex items-center gap-4 mb-3">
                     <div className="flex items-center gap-1 text-sm text-muted-foreground">
                       <Calendar className="h-3 w-3" />
-                      <span>{post.createdAt}</span>
+                      <span>{properDate(post.createdAt)}</span>
                     </div>
                   </div>
                   <Link href={`/post/${post._id}`}>
