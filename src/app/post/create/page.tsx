@@ -30,6 +30,7 @@ const initialContent = `
 export default function CreateBlogPage() {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isDrafting, setIsDrafting] = useState(false)
   const [preview, setPreview] = useState<any | null>(null)
   const [coverImg, setCoverImg] = useState<any | null>(null)
   const [formData, setFormData] = useState({
@@ -37,6 +38,7 @@ export default function CreateBlogPage() {
     description:"",
     categories:"",
     content: initialContent,
+    contentImage: coverImg,
     coverImage: coverImg 
   })
 
@@ -45,23 +47,36 @@ export default function CreateBlogPage() {
   formInfo.append( "title",formData.title)
   formInfo.append("description" ,formData.description)
   formInfo.append("categories",formData.categories)
+  // formInfo.append( "content[0][type]",'text')
   formInfo.append( "content",formData.content)
+  formInfo.append( "contentImage",formData.contentImage)
   formInfo.append( "coverImage",formData.coverImage)
 
 
   const handleRawFiles = (file:File) => {
-    setFormData({...formData, content:file})
-    console.log("GOT THEM FILES:", formData?.content)
+    setFormData({...formData, contentImage:file})
+    console.log("GOT THEM FILES:", formData?.contentImage)
   }
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
-      // In a real app, you would upload this to a server and get a URL back
-      // For this example, we'll use a placeholder
-      console.log(file)
       setFormData((prev) => ({ ...prev, coverImage:file,}))
       setPreview(URL.createObjectURL(file))
       console.log(formData)
+    }
+  }
+
+  const handleDraft = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsDrafting(true);
+    sessionStorage.setItem("post",JSON.stringify(formData))
+    const session = sessionStorage.getItem("user")
+    const user = session ? JSON.parse(session) : null ;
+    if (user) {
+      setIsDrafting(false);
+      router.push(`/profile/${user?.id}`)
+    } else {
+      router.push("/")
     }
   }
 
@@ -72,11 +87,14 @@ export default function CreateBlogPage() {
       console.log(formData)
       const data:any = await postData("/create",formInfo)
       console.log(data)
-      const userId = data.user
-       if (userId) {
-         router.push(`/post/${userId}`)
-       }
-      setIsSubmitting(false)
+      const postId = data._id
+       if (!postId) {
+         setIsSubmitting(false);
+        } else {
+          router.push(`/post/${postId}`)
+          setIsSubmitting(false)
+        }
+
     } catch (error) {
       console.log(error)
     }
@@ -159,20 +177,11 @@ export default function CreateBlogPage() {
             </div>
 
             {/* Content */}
-            <div className="space-y-2">
-              <Label htmlFor="content">Content</Label>
-              <Textarea
-                id="content"
-                placeholder="Write your blog content here..."
-                rows={15}
-                value={formData.content}
-                onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                required
-              />
-              <div className="container py-12 max-w-4xl">
+            <div className="mb-2">
+              <div className="container pb-12 max-w-4xl">
                 <Toaster />
-                <h1 className="text-3xl font-bold mb-2">Modern Text Editor</h1>
-                <p className="text-muted-foreground mb-8">A rich text editor with image upload capabilities</p>
+                <h1 className="text-3xl font-bold mb-2">Content</h1>
+                <p className="text-muted-foreground mb-8">Kuku's text editor</p>
 
                 <Tabs defaultValue="edit">
                   <TabsList className="mb-4">
@@ -240,8 +249,15 @@ export default function CreateBlogPage() {
               Cancel
             </Button>
             <div className="flex gap-2">
-              <Button variant="outline" type="button">
-                Save as Draft
+              <Button variant="outline" onClick={handleDraft} type="button" disabled={isDrafting}>
+               {isDrafting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Saving...   
+                </>
+               ):(
+                 "Save as Draft"
+               ) }
               </Button>
               <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting ? (

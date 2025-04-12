@@ -13,7 +13,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { profile } from "@/utils/api"
 import { userSchema } from "@/utils/verification"
-
+import { useSession, signIn, signOut } from "next-auth/react"
 
 export default function AuthPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -26,6 +26,9 @@ export default function AuthPage() {
     email, password, firstname, lastname,
   });
   const [error, setError] = useState({})
+  const { data: session, status } = useSession();
+
+
   // type SignupForm = {
   //   firstname?:string ,
   //   lastname?:string,
@@ -163,9 +166,6 @@ export default function AuthPage() {
                     </div>
                     <Input id="password" type="password" onChange={handlePassWordChange}  required />
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox id="remember" />
-                  </div>
                 </CardContent>
                 <CardFooter>
                   <Button type="submit" className="w-full" disabled={isLoading}>
@@ -230,7 +230,7 @@ export default function AuthPage() {
                   <Button className="w-full bg-transparent">
                      Sign Up with Google 
                   </Button>
-                  <Button className="w-full bg-black">
+                  <Button className="w-full bg-black" onClick={()=> signIn('github')}>
                      Sign Up with Github  
                   </Button>
                 </CardFooter>

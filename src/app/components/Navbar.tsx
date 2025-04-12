@@ -3,18 +3,33 @@ import Image from 'next/image'
 import React, { useEffect, useRef, useState } from 'react'
 import Link from "next/link"
 import { ArrowRight, Menu, Search, X } from 'lucide-react'
+import { motion } from "framer-motion"
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { useSession, signIn, signOut } from "next-auth/react"
 
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [user, setUser] = useState<any>()
   const headerRef = useRef<HTMLDivElement>(null);
+  const { data: session, status } = useSession();
+  
   useEffect(()=> {
     const session = sessionStorage.getItem("user")
     setUser(session ? JSON.parse(session) : null)
   },[])
+    
+  // if (status === 'loading') return (
+  //   <div className="flex items-center justify-center h-screen bg-gray-100">
+  //   <motion.div
+  //     className="w-12 h-12 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin"
+  //     initial={{ opacity: 0 }}
+  //     animate={{ opacity: 1 }}
+  //     transition={{ duration: 0.5 }}
+  //   ></motion.div>
+  // </div>
+  // )
   return (
     <>
     <div className='items-center z-0 text-foreground'>
@@ -40,14 +55,14 @@ const Navbar = () => {
           <div>CONTACT</div>
         </div>
         <div>
-          {user ? (
+          {user || session ? (
             <Link href={`/profile/${user.id}`} className="flex flex-row gap-5 justify-center items-center ">
             <p>
-              Welcome {user.name}
+              Welcome {user.name || session?.user?.name}
             </p>
             <Avatar className='hidden md:flex'>
-              <AvatarImage src={user?.image?.map((i)=> i.value)} alt={user?.name} />
-              <AvatarFallback>{user?.name?.charAt(0)}</AvatarFallback>
+              <AvatarImage src={user?.image?.map((i)=> i.value) || session?.user?.image} alt={session?.user?.name || user?.name} />
+              <AvatarFallback>{user?.name?.charAt(0) || session?.user?.name?.charAt(0)}</AvatarFallback>
             </Avatar>
             </Link>
           ) : (
@@ -120,7 +135,7 @@ const Navbar = () => {
                 </nav>
                 <div className="flex flex-col space-y-4">
                   <div className="flex space-x-4">
-                    {user? (
+                    {user || session ? (
                     <Link href="/post/create" className="flex-1">
                       <Button className="w-full">Get Started</Button>
                     </Link>
@@ -155,7 +170,7 @@ const Navbar = () => {
                   </Button>
                 </Link>
                 <Link href="/post/create">
-                  <Button size="lg" variant="outline" className="w-full sm:w-auto border-white text-primary hover:bg-transparent hover:text-white">
+                  <Button size="lg" variant="outline" className={`w-full sm:w-auto ${user || session ? "hidden" : "flex" } border-white text-primary hover:bg-transparent hover:text-white`}>
                     Start Writing
                   </Button>
                 </Link>

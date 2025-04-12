@@ -97,7 +97,7 @@ export default function BlogPost() {
               <AvatarFallback>{posts?.user?.name?.charAt(0)}</AvatarFallback>
             </Avatar>
             <div>
-              <h3 className="font-medium">{posts?.user?.name}</h3>
+              <h3 className="font-medium">{posts?.user?.name || posts?.user?.firstname}</h3>
               <p className="text-sm text-muted-foreground">{posts?.user?.bio}</p>
             </div>
           </div>
