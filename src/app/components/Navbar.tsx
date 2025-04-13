@@ -58,7 +58,7 @@ const Navbar = () => {
           {user || session ? (
             <Link href={`/profile/${user?.id || session?.user?.id}`} className="flex flex-row gap-5 justify-center items-center ">
             <p>
-              Welcome {user.name || session?.user?.name}
+              Welcome {user?.name || session?.user?.name}
             </p>
             <Avatar className='hidden md:flex'>
               <AvatarImage src={user?.image?.map((i)=> i.value) || session?.user?.image} alt={session?.user?.name || user?.name} />
