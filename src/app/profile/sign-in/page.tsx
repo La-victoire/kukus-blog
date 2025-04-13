@@ -173,10 +173,10 @@ export default function AuthPage() {
                   <Button type="submit" className="w-full" disabled={isLoading}>
                     {isLoading ? "Signing in..." : "Sign In"} 
                   </Button>
-                  <Button type="button" className="w-full bg-transparent text-black hover:text-white" onClick={handleAuth("google")}>
+                  <Button type="button" className="w-full bg-transparent text-black hover:text-white" onClick={() => handleAuth("google")}>
                      Sign in with Google 
                   </Button>
-                  <Button type="button" className="w-full bg-black" onClick={handleAuth("github")}>
+                  <Button type="button" className="w-full bg-black" onClick={() => handleAuth("github")}>
                      Sign in with GitHub  
                   </Button>
                 </CardFooter>

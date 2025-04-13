@@ -13,6 +13,7 @@ export const authOptions = {
       clientSecret: process.env.GOOGLE_SECRET as string,
     }),
   ],
+  debug:true,
   session: {
     strategy : "jwt",
     maxAge : 30 * 24 * 60 * 60, //30 Days 
@@ -20,17 +21,23 @@ export const authOptions = {
   callbacks: {
     async jwt({ token, account, user}) {
       if (account && user) {
-       const data = profile("/Oauth",{
-          name: user?.name,
-          email: user?.email,
-          profile_img: user?.image,
-          id: user?.id || user?.sub
-        })
+        try {
+          const data = await profile("/Oauth",{
+             name: user?.name,
+             email: user?.email,
+             profile_img: user?.image,
+             id: user?.id || user?.sub
+           })
+           token.id = data?._id || user?.id
+           token.name = user?.name
+           token.email = user?.email;
+           token.picture = user?.image;
+   
+           console.log(data)
+        } catch (error) {
+          console.log(error)
+        }
 
-        token.id = data?._id
-        token.name = user?.name
-        token.email = user?.email;
-        token.picture = user?.image;
       }
       return token;
     },
