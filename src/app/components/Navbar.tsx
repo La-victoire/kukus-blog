@@ -56,7 +56,7 @@ const Navbar = () => {
         </div>
         <div>
           {user || session ? (
-            <Link href={`/profile/${user.id}`} className="flex flex-row gap-5 justify-center items-center ">
+            <Link href={`/profile/${user?.id || session?.user?.id}`} className="flex flex-row gap-5 justify-center items-center ">
             <p>
               Welcome {user.name || session?.user?.name}
             </p>

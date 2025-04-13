@@ -109,7 +109,10 @@ export default function AuthPage() {
       console.log(error)
     }
   }
-
+  const handleAuth = (provider:string) => {
+    signIn(provider);
+    router.push('/')
+  }
   const handleFirstnameChange = async (e)=> {
     const value = e.target.value; 
     setFirstname(value);
@@ -170,10 +173,10 @@ export default function AuthPage() {
                   <Button type="submit" className="w-full" disabled={isLoading}>
                     {isLoading ? "Signing in..." : "Sign In"} 
                   </Button>
-                  <Button type="button" className="w-full bg-transparent text-black hover:text-white" onClick={()=> signIn('google')}>
+                  <Button type="button" className="w-full bg-transparent text-black hover:text-white" onClick={handleAuth("google")}>
                      Sign in with Google 
                   </Button>
-                  <Button type="button" className="w-full bg-black" onClick={()=> signIn('github')}>
+                  <Button type="button" className="w-full bg-black" onClick={handleAuth("github")}>
                      Sign in with GitHub  
                   </Button>
                 </CardFooter>
