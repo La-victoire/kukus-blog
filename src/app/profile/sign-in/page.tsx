@@ -26,7 +26,6 @@ export default function AuthPage() {
     email, password, firstname, lastname,
   });
   const [error, setError] = useState({})
-  const { data: session, status } = useSession();
 
 
   // type SignupForm = {
@@ -167,9 +166,15 @@ export default function AuthPage() {
                     <Input id="password" type="password" onChange={handlePassWordChange}  required />
                   </div>
                 </CardContent>
-                <CardFooter>
+                <CardFooter className="flex flex-col pt-2 gap-2">
                   <Button type="submit" className="w-full" disabled={isLoading}>
                     {isLoading ? "Signing in..." : "Sign In"} 
+                  </Button>
+                  <Button type="button" className="w-full bg-transparent text-black hover:text-white" onClick={()=> signIn('google')}>
+                     Sign in with Google 
+                  </Button>
+                  <Button type="button" className="w-full bg-black" onClick={()=> signIn('github')}>
+                     Sign in with GitHub  
                   </Button>
                 </CardFooter>
               </form>
@@ -223,15 +228,9 @@ export default function AuthPage() {
                     </Label>
                   </div>
                 </CardContent>
-                <CardFooter className="flex flex-col">
+                <CardFooter >
                   <Button type="submit" className="w-full" disabled={isLoading}>
                     {isLoading ? "Creating account..." : "Create account"}
-                  </Button>
-                  <Button className="w-full bg-transparent">
-                     Sign Up with Google 
-                  </Button>
-                  <Button className="w-full bg-black" onClick={()=> signIn('github')}>
-                     Sign Up with Github  
                   </Button>
                 </CardFooter>
               </form>
