@@ -78,19 +78,19 @@ export default function AuthPage() {
     e.preventDefault()
     setIsLoading(true)
 
-    try {
-      const plainData = {
-    firstname: formInfo.get("firstname") as string,
-    lastname: formInfo.get("lastname") as string,
-    email: formInfo.get("email") as string,
-    password: formInfo.get("password") as string,
-  };
-     const result = userSchema.safeParse(plainData)
-     if (!result.success) {
-      console.error(result.error)
-      setError(result.error.format())
-      setIsLoading(false)
-    } else {
+  //   try {
+  //     const plainData = {
+  //   firstname: formInfo.get("firstname") as string,
+  //   lastname: formInfo.get("lastname") as string,
+  //   email: formInfo.get("email") as string,
+  //   password: formInfo.get("password") as string,
+  // };
+  //    const result = userSchema.safeParse(plainData)
+  //    if (!result.success) {
+  //     console.error(result.error)
+  //     setError(result.error.format())
+  //     setIsLoading(false)
+  //   } else {
       const data:any = await profile("/signup",formInfo)
       console.log(data)
         const userId = data.user._id
@@ -104,13 +104,15 @@ export default function AuthPage() {
         if(!userId){
           location.reload();
         }
-    }
-    } catch (error) {
-      console.log(error)
-    }
+    // }
+    // } catch (error) {
+    //   console.log(error)
+    // }
   }
   const handleAuth = (provider:string) => {
-    signIn(provider);
+    setTimeout(()=>{
+      signIn(provider);
+    },6000)
     router.push('/')
   }
   const handleFirstnameChange = async (e)=> {
@@ -197,8 +199,8 @@ export default function AuthPage() {
                     <div className="space-y-2">
                       <Label htmlFor="firstname">First name</Label>
                       <Input id="firstname" onChange={()=> handleFirstnameChange}  required />
-                      {error && (<p className="text-red"> {error?.firstname?._errors}
-                        </p>)}
+                      {/* {error && (<p className="text-red"> {error?.firstname?._errors} */}
+                        {/* </p>)} */}
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="lastname">Last name</Label>

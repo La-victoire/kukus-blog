@@ -17,7 +17,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { ArrowRight, ChevronRight, Heart, MessageCircle, Share2, Search, Menu, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import Navbar from "./components/Navbar";
-
+import { useSession, signIn, signOut } from "next-auth/react"
 const fetcher = async (url: string) => await getData<any>(url);
 
 
@@ -27,6 +27,7 @@ const DataComponent = () => {
   const [value, setValue] = useState("");
   const [isQuery, setIsQuery] = useState(false);
   const { data:posts, error:postError, isLoading:postsLoading } = useSWR("/view", fetcher);
+  const { data: session, status } = useSession();
 
   
   const handleSearch = async ()=> {
@@ -234,6 +235,13 @@ const DataComponent = () => {
                 
               </div>
         </div>
+        {
+          session && (
+        <Button onClick={()=> signOut()} >
+          LogOut
+        </Button>
+          )
+        }
         </div>
         </div>
       </footer>

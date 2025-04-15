@@ -9,27 +9,35 @@ import { Input } from '@/components/ui/input'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useSession, signIn, signOut } from "next-auth/react"
 
+ const highLight = 'justify-center items-center flex bg-gray-900 h-full px-5 rounded-3xl transition-all'
+
 const Navbar = () => {
+  const [isPrevious, setIsPrevious] = useState(1)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [user, setUser] = useState<any>()
   const headerRef = useRef<HTMLDivElement>(null);
   const { data: session, status } = useSession();
   
   useEffect(()=> {
-    const session = sessionStorage.getItem("user")
-    setUser(session ? JSON.parse(session) : null)
+    const store = sessionStorage.getItem("user")
+    setUser(store ? JSON.parse(store) : null)
+    if (session) {
+      sessionStorage.setItem("user", JSON.stringify({name:session?.user?.name ,image:session?.user?.image, id:session?.user?.id}))
+    }
   },[])
-    
-  // if (status === 'loading') return (
-  //   <div className="flex items-center justify-center h-screen bg-gray-100">
-  //   <motion.div
-  //     className="w-12 h-12 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin"
-  //     initial={{ opacity: 0 }}
-  //     animate={{ opacity: 1 }}
-  //     transition={{ duration: 0.5 }}
-  //   ></motion.div>
-  // </div>
-  // )
+
+  const handleActive = (key:number) => {
+    setIsPrevious(key) 
+  }
+  const firstName = (name:string | null | undefined) => {
+    if (name?.includes(' ')) {
+    const [firstname, lastname] = name?.split(' ')
+    return firstname
+    } else {
+      return name
+    }
+  }
+
   return (
     <>
     <div className='items-center z-0 text-foreground'>
@@ -49,16 +57,20 @@ const Navbar = () => {
           <div>  
           <Menu className="h-6 w-6" />             
             </div>
-          <div className=' bg-gray-900 h-full px-5 rounded-3xl transition-all  justify-center items-center flex'>HOME</div>
-          <div> ABOUT</div>
-          <div>TRENDING</div>
-          <div>CONTACT</div>
+          <div className={`${highLight}`}>
+           {[ 'HOME','ABOUT','TRENDING','CONTACT' ].map((item, index:number)=>(
+            <p key={index} className={`${ isPrevious === index ? highLight : "bg-transparent " }flex justify-between`} onClick={()=> setIsPrevious(index)}>
+              {item}
+            </p>
+           ))}
+          </div>
+
         </div>
         <div>
           {user || session ? (
             <Link href={`/profile/${user?.id || session?.user?.id}`} className="flex flex-row gap-5 justify-center items-center ">
             <p>
-              Welcome {user?.name || session?.user?.name}
+              Welcome {user?.name || firstName(session?.user?.name) }
             </p>
             <Avatar className='hidden md:flex'>
               <AvatarImage src={user?.image?.map((i)=> i.value) || session?.user?.image} alt={session?.user?.name || user?.name} />
@@ -136,9 +148,16 @@ const Navbar = () => {
                 <div className="flex flex-col space-y-4">
                   <div className="flex space-x-4">
                     {user || session ? (
-                    <Link href="/post/create" className="flex-1">
-                      <Button className="w-full">Get Started</Button>
-                    </Link>
+                    <>
+                      <Link href="/post/create" className="flex-1">
+                        <Button className="w-full">Get Started</Button>
+                      </Link>
+                      <div className='flex-1'>
+                      <Button variant="outline" className='w-full  border-white text-black hover:bg-transparent hover:text-white' onClick={()=> signOut()} >
+                      LogOut
+                      </Button>
+                      </div>
+                    </>
                     ) : (
                     <Link href="/sign-in" className="flex-1">
                       <Button variant="outline" className="w-full border-white text-black hover:bg-transparent hover:text-white">

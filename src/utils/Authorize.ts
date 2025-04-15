@@ -28,12 +28,11 @@ export const authOptions = {
              profile_img: user?.image,
              id: user?.id || user?.sub
            })
-           token.id = data?._id || user?.id
            token.name = user?.name
            token.email = user?.email;
            token.picture = user?.image;
+           token.id = data?.user?._id
    
-           console.log(data)
         } catch (error) {
           console.log(error)
         }
