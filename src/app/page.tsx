@@ -236,7 +236,7 @@ const DataComponent = () => {
               </div>
         </div>
         {
-          session && (
+          status === 'authenticated' && (
         <Button onClick={()=> signOut()} >
           LogOut
         </Button>

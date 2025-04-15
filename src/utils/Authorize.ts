@@ -13,7 +13,6 @@ export const authOptions = {
       clientSecret: process.env.GOOGLE_SECRET as string,
     }),
   ],
-  debug:true,
   session: {
     strategy : "jwt",
     maxAge : 30 * 24 * 60 * 60, //30 Days 

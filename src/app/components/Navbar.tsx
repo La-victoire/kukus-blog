@@ -9,21 +9,23 @@ import { Input } from '@/components/ui/input'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useSession, signIn, signOut } from "next-auth/react"
 
- const highLight = 'justify-center items-center flex bg-gray-900 h-full px-5 rounded-3xl transition-all'
+ const highLight = ' flex h-[40px] px-3 items-center bg-gray-900 rounded-3xl transition-all'
 
 const Navbar = () => {
   const [isPrevious, setIsPrevious] = useState(1)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [user, setUser] = useState<any>()
+  const [Oauth, setOauth] = useState<any>()
   const headerRef = useRef<HTMLDivElement>(null);
   const { data: session, status } = useSession();
   
   useEffect(()=> {
     const store = sessionStorage.getItem("user")
     setUser(store ? JSON.parse(store) : null)
-    if (session) {
-      sessionStorage.setItem("user", JSON.stringify({name:session?.user?.name ,image:session?.user?.image, id:session?.user?.id}))
+    if (status === "authenticated") {
+      sessionStorage.setItem("OauthUser", JSON.stringify({name:session?.user?.name ,image:session?.user?.image, id:session?.user?.id}))
     }
+    setOauth(sessionStorage.getItem('OauthUser'))
   },[])
 
   const handleActive = (key:number) => {
@@ -47,33 +49,35 @@ const Navbar = () => {
         ref={headerRef}
         className="relative h-screen max-h-[800px] w-full overflow-hidden"
       >
-      <div className='flex z-20 absolute text-white items-center top-5 w-full justify-between justify-items-center px-10'>
+      <div className='flex z-20 absolute text-white items-center top-5 w-full gap-5 justify-between px-10'>
         <div>
           <img src="/K_20250309_145243_0000.png" alt="logo" 
           className='w-14 h-auto rounded-full'
           />
         </div>
-        <div className='hidden md:flex justify-between w-[50dvw] h-[10dvh] rounded-4xl mx-10  bg-black items-center px-5'>
+        <div className='hidden md:flex w-[50dvw] h-[10dvh] rounded-4xl mx-10 gap-5 bg-black justify-center items-center px-5'>
           <div>  
           <Menu className="h-6 w-6" />             
             </div>
-          <div className={`${highLight}`}>
-           {[ 'HOME','ABOUT','TRENDING','CONTACT' ].map((item, index:number)=>(
-            <p key={index} className={`${ isPrevious === index ? highLight : "bg-transparent " }flex justify-between`} onClick={()=> setIsPrevious(index)}>
-              {item}
+          <div className='flex hover:cursor-default active:cursor-pointer justify-center items-center gap-5'> 
+           {[ {name:'HOME', id:0},{name:'FEATURED',id:1},{name:'LATEST',id:2},{name:'CONTACT',id:3} ].map((item, index:number)=>(
+            <p key={item.id} className={`${ isPrevious === item.id ? `${highLight}` : "bg-transparent " }`} onClick={()=> handleActive(item.id)}>
+              <Link href={`#${item.name.toLowerCase() }`}>
+              {item.name}
+              </Link>
             </p>
            ))}
           </div>
 
         </div>
         <div>
-          {user || session ? (
+          {user || status === "authenticated" ? (
             <Link href={`/profile/${user?.id || session?.user?.id}`} className="flex flex-row gap-5 justify-center items-center ">
             <p>
               Welcome {user?.name || firstName(session?.user?.name) }
             </p>
             <Avatar className='hidden md:flex'>
-              <AvatarImage src={user?.image?.map((i)=> i.value) || session?.user?.image} alt={session?.user?.name || user?.name} />
+              <AvatarImage src={  Array.isArray(user?.image) && user?.image.map((i)=> i.value) || session?.user?.image } alt={session?.user?.name || user?.name} />
               <AvatarFallback>{user?.name?.charAt(0) || session?.user?.name?.charAt(0)}</AvatarFallback>
             </Avatar>
             </Link>
@@ -189,7 +193,7 @@ const Navbar = () => {
                   </Button>
                 </Link>
                 <Link href="/post/create">
-                  <Button size="lg" variant="outline" className={`w-full sm:w-auto ${user || session ? "hidden" : "flex" } border-white text-primary hover:bg-transparent hover:text-white`}>
+                  <Button size="lg" variant="outline" className={`w-full sm:w-auto ${user || session ? "flex" : "hidden" } border-white text-primary hover:bg-transparent hover:text-white`}>
                     Start Writing
                   </Button>
                 </Link>
