@@ -185,7 +185,7 @@ export default function ProfilePage () {
                                 Edit
                               </Button>
                             </Link>
-                            <Button variant="destructive" className="active:cursor-pointer" onClick={()=>(handleDelete)}>
+                            <Button variant="destructive" className="active:cursor-pointer" onClick={()=>handleDelete}>
                               Delete {post.title}
                             </Button>
                           </div>

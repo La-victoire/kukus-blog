@@ -1,4 +1,4 @@
-import { profile } from "@/utils/api";
+import { Oauth } from "@/utils/api";
 import GithubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
 
@@ -21,16 +21,22 @@ export const authOptions = {
     async jwt({ token, account, user}) {
       if (account && user) {
         try {
-          const data = await profile("/Oauth",{
+          const data = await Oauth("/Oauth",{
              name: user?.name,
              email: user?.email,
              profile_img: user?.image,
              id: user?.id || user?.sub
-           })
+           });
+
+           const setCookie = data?.headers["set-cookie"]?.map((cookie)=> cookie).join('');
+           console.log(setCookie)
            token.name = user?.name
            token.email = user?.email;
            token.picture = user?.image;
-           token.id = data?.user?._id
+           token.id = data?.data?.data?.user?._id;
+           token.accessCookie = setCookie ;
+           
+
    
         } catch (error) {
           console.log(error)
@@ -45,6 +51,8 @@ export const authOptions = {
       session.user.name = token.name;
       session.user.email = token.email;
       session.user.image = token.picture;
+      session.accessCookie = token.accessCookie;
+      
 
       return session;
     },

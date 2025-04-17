@@ -24,8 +24,22 @@ const Navbar = () => {
     setUser(store ? JSON.parse(store) : null)
     if (status === "authenticated") {
       sessionStorage.setItem("OauthUser", JSON.stringify({name:session?.user?.name ,image:session?.user?.image, id:session?.user?.id}))
+      const cookieParts = session.accessCookie.split('; ');
+
+      // Split the Auth cookie
+      const authCookie = cookieParts[0];
+      
+      // Split the userInfo cookie (from the second part onwards)
+      const userInfoCookie = cookieParts[1];
+
+      // Set the Auth cookie
+      document.cookie = authCookie.trim() + '; Secure; SameSite=None';
+      
+      // Set the userInfo cookie
+      document.cookie = userInfoCookie.trim() + '; Secure; SameSite=None';
     }
     setOauth(sessionStorage.getItem('OauthUser'))
+
   },[])
 
   const handleActive = (key:number) => {
@@ -72,7 +86,7 @@ const Navbar = () => {
         </div>
         <div>
           {user || status === "authenticated" ? (
-            <Link href={`/profile/${user?.id || session?.user?.id}`} className="flex flex-row gap-5 justify-center items-center ">
+            <Link href={`/profile/${user?.id || Oauth?.id}`} className="flex flex-row gap-5 justify-center items-center ">
             <p>
               Welcome {user?.name || firstName(session?.user?.name) }
             </p>

@@ -14,7 +14,9 @@ const profileApi = axios.create({
   headers : {
     "Content-Type":"application/json",
   },
-  withCredentials:true
+  withCredentials:true,
+  maxRedirects: 0,
+  validateStatus : (status) => status >= 200 && status < 400,
 });
 
 
@@ -23,6 +25,15 @@ type ApiResponse<T> = {
   success: boolean;
   data: T;
   message?: string;
+};
+
+export const Oauth = async (endpoint: string, data : any) => {
+try {
+  const response = await profileApi.post(endpoint,data);
+  return response
+} catch (error) {
+  handleError(error)
+  }
 };
 
 // GET Request from this Api

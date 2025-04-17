@@ -51,7 +51,8 @@ export default function EditProfilePage() {
   useEffect(()=> {
     const getSession = () => {
       const session = sessionStorage.getItem("user")
-      setUserId(session ? JSON.parse(session) : null)
+      const Oauth = sessionStorage.getItem("OauthUser")
+      setUserId(session ? JSON.parse(session) : JSON.parse(Oauth))
     }
     
     getSession()
