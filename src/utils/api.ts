@@ -52,6 +52,7 @@ export const postData = async <T>(endpoint: string, data:any): Promise<T> => {
   try {
     const response = await postsApi.post<ApiResponse<T>>(endpoint,data);
     return response.data.data;
+
   } catch (error) {
     handleError(error);
   }

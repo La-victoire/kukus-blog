@@ -83,7 +83,6 @@ export default function ProfilePage () {
     setIsSubmitting(true)
     try {
       console.log(id);
-      
       const data = await deleteData(id)
       if (!data) {
         setIsSubmitting(false)
@@ -185,7 +184,7 @@ export default function ProfilePage () {
                                 Edit
                               </Button>
                             </Link>
-                            <Button variant="destructive" className="active:cursor-pointer" onClick={()=>handleDelete}>
+                            <Button variant="destructive" className="active:cursor-pointer" onClick={handleDelete}>
                               Delete {post.title}
                             </Button>
                           </div>
