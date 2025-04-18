@@ -110,10 +110,7 @@ export default function AuthPage() {
     // }
   }
   const handleAuth = (provider:string) => {
-    setTimeout(()=>{
-      signIn(provider);
-    },6000)
-    router.push('/')
+      signIn(provider, {callbackUrl: "/"});
   }
   const handleFirstnameChange = async (e)=> {
     const value = e.target.value; 

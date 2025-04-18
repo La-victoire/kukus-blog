@@ -23,10 +23,21 @@ const Navbar = () => {
     const store = sessionStorage.getItem("user")
     setUser(store ? JSON.parse(store) : null)
     if (status === "authenticated") {
+      try {
+        const getCookie = async () => {
+          const res = await fetch("/api/set-cookie",{credentials: "include"})
+          if (!res.ok) {
+            console.error(Error)
+          }
+          const data = res.json()
+          console.log("Cookie set :", data)
+        }
+
+        getCookie()
+      } catch (error) {
+        console.error(error)        
+      }
       sessionStorage.setItem("OauthUser", JSON.stringify({name:session?.user?.name ,image:session?.user?.image, id:session?.user?.id}))
-      const cookieParts = session.accessCookie;
-      console.log(cookieParts)
-      document.cookie = cookieParts
     }
     setOauth(sessionStorage.getItem('OauthUser'))
 
